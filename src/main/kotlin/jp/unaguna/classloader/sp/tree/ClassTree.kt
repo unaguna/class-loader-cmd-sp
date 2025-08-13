@@ -1,4 +1,4 @@
-package jp.unaguna.classloadersp.tree
+package jp.unaguna.classloader.sp.tree
 
 abstract class ClassTree<E> {
     protected var root: ClassTreeNode<E>? = null

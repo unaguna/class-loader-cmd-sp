@@ -1,4 +1,4 @@
-package jp.unaguna.classloadersp.utils
+package jp.unaguna.classloader.utils
 
 import java.io.File
 import java.net.URL

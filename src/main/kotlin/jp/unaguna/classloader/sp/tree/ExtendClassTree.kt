@@ -1,4 +1,4 @@
-package jp.unaguna.classloadersp.tree
+package jp.unaguna.classloader.sp.tree
 
 import org.springframework.beans.factory.config.BeanDefinition
 

@@ -1,9 +1,10 @@
-package jp.unaguna.classloadersp.cmd
+package jp.unaguna.classloader.sp.cmd
 
-import jp.unaguna.classloadersp.SubclassDefinitionProvider
-import jp.unaguna.classloadersp.tree.ExtendClassTree
-import jp.unaguna.classloadersp.utils.classpathSpecToURLArray
+import jp.unaguna.classloader.sp.SubclassDefinitionProvider
+import jp.unaguna.classloader.sp.tree.ExtendClassTree
+import jp.unaguna.classloader.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
+import kotlin.collections.iterator
 
 fun main() {
     val classpath = classpathSpecToURLArray("C:\\programs\\class-loader-cmd-sandbox\\one.jar;C:\\programs\\class-loader-cmd-sandbox\\two.jar")
