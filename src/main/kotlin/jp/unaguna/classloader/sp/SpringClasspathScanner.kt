@@ -5,6 +5,7 @@ import jp.unaguna.classloader.core.ScannedElement
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
+import org.springframework.context.annotation.ScannedGenericBeanDefinition
 import org.springframework.core.io.DefaultResourceLoader
 import org.springframework.core.io.Resource
 import org.springframework.core.type.filter.AssignableTypeFilter
@@ -73,6 +74,8 @@ class SpringClasspathScannerElement(
     override val element: BeanDefinition,
     override val depth: Int,
 ) : ScannedElement<BeanDefinition> {
+    private val bd = element as ScannedGenericBeanDefinition
+
     override val className: String
         get() = element.beanClassName!!
 
@@ -81,4 +84,7 @@ class SpringClasspathScannerElement(
             is Resource -> src.url
             else -> null
         }
+
+    override val isAbstract: Boolean
+        get() = bd.metadata.isAbstract
 }
