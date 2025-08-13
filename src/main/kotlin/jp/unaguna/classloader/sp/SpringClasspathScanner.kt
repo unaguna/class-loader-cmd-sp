@@ -57,7 +57,7 @@ private class SpringClasspathScannerIterator(
     override fun next(): SpringClasspathScannerElement {
         val (innerNext, depth) = innerIterator.next()
         return SpringClasspathScannerElement(
-            innerNext!!,
+            innerNext,
             depth = depth,
         )
     }

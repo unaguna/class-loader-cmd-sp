@@ -1,8 +1,6 @@
 package jp.unaguna.classloader.sp.cmd
 
 import jp.unaguna.classloader.sp.SpringClasspathScanner
-import jp.unaguna.classloader.sp.SubclassDefinitionProvider
-import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
 import kotlin.collections.iterator
