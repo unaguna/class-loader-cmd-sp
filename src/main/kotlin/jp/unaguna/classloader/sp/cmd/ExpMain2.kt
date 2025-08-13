@@ -15,6 +15,6 @@ fun main() {
 
     // 指定パッケージ配下をスキャン
     for (scanned in scanner.scan()) {
-        println("\t".repeat(scanned.depth) + scanned.element.beanClassName + "\t" + scanned.element.source)
+        println("\t".repeat(scanned.depth) + scanned.className + "\t" + scanned.classSource)
     }
 }

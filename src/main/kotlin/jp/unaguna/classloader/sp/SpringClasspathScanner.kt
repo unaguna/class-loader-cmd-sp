@@ -6,7 +6,11 @@ import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.io.DefaultResourceLoader
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
 import org.springframework.core.type.filter.AssignableTypeFilter
+import java.net.URL
 
 class SpringClasspathScanner(
     private val classLoader: ClassLoader,
@@ -70,4 +74,13 @@ private class SpringClasspathScannerIterator(
 class SpringClasspathScannerElement(
     override val element: BeanDefinition,
     override val depth: Int,
-) : ScannedElement<BeanDefinition>
+) : ScannedElement<BeanDefinition> {
+    override val className: String
+        get() = element.beanClassName!!
+
+    override val classSource: URL?
+        get() = when (val src = element.source) {
+            is Resource -> src.url
+            else -> null
+        }
+}
