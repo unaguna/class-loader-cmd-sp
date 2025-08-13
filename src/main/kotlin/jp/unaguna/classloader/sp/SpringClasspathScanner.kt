@@ -6,9 +6,7 @@ import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.io.DefaultResourceLoader
-import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
-import org.springframework.core.io.UrlResource
 import org.springframework.core.type.filter.AssignableTypeFilter
 import java.net.URL
 
