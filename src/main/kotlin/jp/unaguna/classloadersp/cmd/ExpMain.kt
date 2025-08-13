@@ -1,6 +1,7 @@
 package jp.unaguna.classloadersp.cmd
 
 import jp.unaguna.classloadersp.SubclassDefinitionProvider
+import jp.unaguna.classloadersp.tree.ExtendClassTree
 import jp.unaguna.classloadersp.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
 
@@ -12,8 +13,14 @@ fun main() {
         superClass = classLoader.loadClass("com.A"),
     )
 
+    val tree = ExtendClassTree(classLoader)
+
     // 指定パッケージ配下をスキャン
     for (bd in defProvider) {
-        println(bd.beanClassName)
+        tree.append(bd)
+    }
+
+    for ((bd, depth) in tree.iterator()) {
+        println("\t".repeat(depth) + bd?.beanClassName + "\t" + bd?.source)
     }
 }
