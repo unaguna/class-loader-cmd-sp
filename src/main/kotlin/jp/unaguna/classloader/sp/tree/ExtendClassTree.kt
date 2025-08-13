@@ -2,7 +2,8 @@ package jp.unaguna.classloader.sp.tree
 
 import org.springframework.beans.factory.config.BeanDefinition
 
-class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefinition?>() {
+class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefinition>() {
+    override val ignoreRoot: Boolean = true
     private val nameMap: MutableMap<String, ExtendTreeNode> = mutableMapOf()
     /** クラス名とそのクラスを継承するサブクラスのマップ */
     private val superClsNameMap: MutableMap<String, MutableList<ExtendTreeNode>> = mutableMapOf()
@@ -60,22 +61,29 @@ class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefi
         nameMap[className] = newNode
 
     }
+
+    fun appendAll(bd: Iterable<BeanDefinition>) {
+        bd.forEach { append(it) }
+    }
 }
 
-class ExtendTreeNode(override val element: BeanDefinition?) : ClassTreeNode<BeanDefinition?> {
+class ExtendTreeNode(private val el: BeanDefinition?) : ClassTreeNode<BeanDefinition> {
     var parentNode: ExtendTreeNode? = null
     val childNodes = mutableListOf<ExtendTreeNode>()
+
+    override val element: BeanDefinition
+        get() = el ?: error("dummy element has been referenced")
 
     override fun parent(): BeanDefinition? {
         return this.parentNode?.element
     }
 
-    override fun parentNode(): ClassTreeNode<BeanDefinition?>? {
+    override fun parentNode(): ClassTreeNode<BeanDefinition>? {
         return this.parentNode
     }
 
     override fun children(): Iterable<BeanDefinition> {
-        return childNodes.map { it.element!! }
+        return childNodes.map { it.element }
     }
 
     override fun childNode(index: Int): ExtendTreeNode {

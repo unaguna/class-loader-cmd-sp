@@ -2,6 +2,7 @@ package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClasspathScannerResettable
 import jp.unaguna.classloader.core.ScannedElement
+import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.io.DefaultResourceLoader
@@ -11,13 +12,18 @@ class SpringClasspathScanner(
     private val classLoader: ClassLoader,
 ): ClasspathScannerResettable<BeanDefinition, SpringClasspathScannerElement> {
     private var basePackage: String? = null
+    private var classExtensionTree: Boolean = false
 
     private val scanner = ClassPathScanningCandidateComponentProvider(false).apply {
         resourceLoader = DefaultResourceLoader(classLoader)
     }
 
     override fun scan(): Iterator<SpringClasspathScannerElement> {
-        return SpringClasspathScannerIterator(scanner.findCandidateComponents(basePackage ?: ""))
+        return SpringClasspathScannerIterator(
+            scanner.findCandidateComponents(basePackage ?: ""),
+            classExtensionTree = this.classExtensionTree,
+            classLoader = this.classLoader,
+        )
     }
 
     override fun subclassOf(cls: Class<*>) {
@@ -28,18 +34,32 @@ class SpringClasspathScanner(
         this.basePackage = basePackage
     }
 
+    override fun asClassExtensionTree() {
+        this.classExtensionTree = true
+    }
+
     override fun clearConditions() {
         scanner.resetFilters(false)
         basePackage = null
+        classExtensionTree = false
     }
 }
 
-private class SpringClasspathScannerIterator(scanned: Iterable<BeanDefinition>): Iterator<SpringClasspathScannerElement> {
-    val innerIterator = scanned.iterator()
+private class SpringClasspathScannerIterator(
+    scanned: Iterable<BeanDefinition>,
+    classExtensionTree: Boolean,
+    classLoader: ClassLoader,
+): Iterator<SpringClasspathScannerElement> {
+    val innerIterator = if (classExtensionTree) {
+        ExtendClassTree(classLoader).apply { appendAll(scanned) }.iterator()
+    } else scanned.iterator().asSequence().map { Pair(it, 0) }.iterator()
 
     override fun next(): SpringClasspathScannerElement {
-        val innerNext = innerIterator.next()
-        return SpringClasspathScannerElement(innerNext)
+        val (innerNext, depth) = innerIterator.next()
+        return SpringClasspathScannerElement(
+            innerNext!!,
+            depth = depth,
+        )
     }
 
     override fun hasNext(): Boolean {
@@ -47,6 +67,7 @@ private class SpringClasspathScannerIterator(scanned: Iterable<BeanDefinition>):
     }
 }
 
-class SpringClasspathScannerElement(override val element: BeanDefinition) : ScannedElement<BeanDefinition> {
-
-}
+class SpringClasspathScannerElement(
+    override val element: BeanDefinition,
+    override val depth: Int,
+) : ScannedElement<BeanDefinition>

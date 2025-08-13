@@ -2,6 +2,7 @@ package jp.unaguna.classloader.sp.tree
 
 abstract class ClassTree<E> {
     protected var root: ClassTreeNode<E>? = null
+    protected open val ignoreRoot = false
 
     open fun isEmpty() = root == null
 
@@ -11,13 +12,19 @@ abstract class ClassTree<E> {
 
 
     private class ClassTreeIterator<E>(private val tree: ClassTree<E>): Iterator<Pair<E, Int>> {
-        var next: ClassTreeNode<E>? = tree.root
         val indexPath: ArrayDeque<Int> = ArrayDeque()
+        var next: ClassTreeNode<E>? = if (tree.ignoreRoot) {
+            if (tree.root?.hasChild() == true) {
+                indexPath.add(0)
+                tree.root!!.childNode(0)
+            } else null
+        } else tree.root
 
         override fun next(): Pair<E, Int> {
             val node = next ?: throw NoSuchElementException()
+            val depth = if (tree.ignoreRoot) indexPath.size - 1 else indexPath.size
 
-            val result = Pair(node.element, indexPath.size)
+            val result = Pair(node.element, depth)
 
             // next を計算しておく
             next = null

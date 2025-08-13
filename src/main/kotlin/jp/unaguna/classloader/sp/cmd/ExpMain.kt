@@ -22,6 +22,6 @@ fun main() {
     }
 
     for ((bd, depth) in tree.iterator()) {
-        println("\t".repeat(depth) + bd?.beanClassName + "\t" + bd?.source)
+        println("\t".repeat(depth) + bd.beanClassName + "\t" + bd.source)
     }
 }
