@@ -3,33 +3,44 @@ package jp.unaguna.classloader.sp
 import jp.unaguna.classloader.core.ClasspathScannerResettable
 import jp.unaguna.classloader.core.ScannedElement
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
-import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.context.annotation.ScannedGenericBeanDefinition
-import org.springframework.core.io.DefaultResourceLoader
 import org.springframework.core.io.Resource
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
+import org.springframework.core.io.support.ResourcePatternResolver
+import org.springframework.core.type.ClassMetadata
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory
+import org.springframework.core.type.classreading.MetadataReader
 import org.springframework.core.type.filter.AssignableTypeFilter
+import org.springframework.core.type.filter.TypeFilter
 import java.net.URL
 
 class SpringClasspathScanner(
-    private val classLoader: ClassLoader,
-): ClasspathScannerResettable<BeanDefinition, SpringClasspathScannerElement> {
+    classLoader: ClassLoader,
+): ClasspathScannerResettable<ClassFileMetadata, SpringClasspathScannerElement> {
     private var basePackage: String? = null
     private var classExtensionTree: Boolean = false
+    private val includeFilters: MutableList<TypeFilter> = mutableListOf()
 
-    private val scanner = CustomClassPathScanningCandidateComponentProvider(classLoader)
+    private val resolver = PathMatchingResourcePatternResolver(classLoader)
 
     override fun scan(): Iterator<SpringClasspathScannerElement> {
+        val packageSearchPath = "classpath*:" + (basePackage ?: "").replace('.', '/') + "/**/*.class"
         return SpringClasspathScannerIterator(
-            scanner.findCandidateComponents(basePackage ?: ""),
+            resolver.getResources(packageSearchPath).toList(),
             classExtensionTree = this.classExtensionTree,
-            classLoader = this.classLoader,
+            resolver = this.resolver,
+            includeFilters = this.includeFilters,
         )
+    }
+    private fun addIncludeFilter(typeFilter: TypeFilter) {
+        includeFilters.add(typeFilter)
+    }
+
+    private fun resetIncludeFilter() {
+        includeFilters.clear()
     }
 
     override fun subclassOf(cls: Class<*>) {
-        scanner.addIncludeFilter(AssignableTypeFilter(cls))
+        this.addIncludeFilter(AssignableTypeFilter(cls))
     }
 
     override fun inPackage(basePackage: String) {
@@ -41,66 +52,88 @@ class SpringClasspathScanner(
     }
 
     override fun clearConditions() {
-        scanner.resetFilters(false)
-        basePackage = null
-        classExtensionTree = false
+         this.resetIncludeFilter()
+         basePackage = null
+         classExtensionTree = false
     }
 }
 
+data class ClassFileMetadata(
+    val resource: Resource,
+    val metadataReader: MetadataReader,
+    val classMetadata: ClassMetadata,
+)
+
 private class SpringClasspathScannerIterator(
-    scanned: Iterable<BeanDefinition>,
+    scanned: Iterable<Resource>,
+    resolver: ResourcePatternResolver,
     classExtensionTree: Boolean,
-    classLoader: ClassLoader,
+    private val includeFilters: List<TypeFilter>,
 ): Iterator<SpringClasspathScannerElement> {
+    val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
-        ExtendClassTree(classLoader).apply { appendAll(scanned) }.iterator()
-    } else scanned.iterator().asSequence().map { Pair(it, 0) }.iterator()
+        ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
+    } else scanned.iterator().asSequence()
+        .map { Pair(loadMetadata(it), 0) }
+        .iterator()
+
+    var nextElement: SpringClasspathScannerElement? = null
+
+    init {
+        calcNext()
+    }
+
+    private fun loadMetadata(resource: Resource): ClassFileMetadata {
+        val metadataReader = metadataReaderFactory.getMetadataReader(resource)
+        val classMetadata = metadataReader.classMetadata
+
+        return ClassFileMetadata(resource, metadataReader, classMetadata)
+    }
+
+    /**
+     * Calc the next element and contain it into [nextElement]
+     */
+    private fun calcNext() {
+        while (innerIterator.hasNext()) {
+            val (nextFileMetadata, depth) = innerIterator.next()
+
+            if (includeFilters.all { it.match(nextFileMetadata.metadataReader, metadataReaderFactory) }) {
+                nextElement = SpringClasspathScannerElement(
+                    nextFileMetadata,
+                    depth = depth,
+                )
+                return
+            }
+        }
+
+        nextElement = null
+    }
 
     override fun next(): SpringClasspathScannerElement {
-        val (innerNext, depth) = innerIterator.next()
-        return SpringClasspathScannerElement(
-            innerNext,
-            depth = depth,
-        )
+        val next = nextElement ?: throw NoSuchElementException()
+        calcNext()
+        return next
     }
 
     override fun hasNext(): Boolean {
-        return innerIterator.hasNext()
+        return nextElement != null
     }
 }
 
 class SpringClasspathScannerElement(
-    override val element: BeanDefinition,
+    override val element: ClassFileMetadata,
     override val depth: Int,
-) : ScannedElement<BeanDefinition> {
-    private val bd = element as ScannedGenericBeanDefinition
-
+) : ScannedElement<ClassFileMetadata> {
     override val className: String
-        get() = element.beanClassName!!
+        get() = element.classMetadata.className
 
     override val classSource: URL?
-        get() = when (val src = element.source) {
-            is Resource -> src.url
-            else -> null
-        }
+        get() = element.resource.url
 
     override val isAbstract: Boolean
-        get() = bd.metadata.isAbstract
+        get() = element.classMetadata.isAbstract
 
     override fun toString(): String {
         return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
-    }
-}
-
-private class CustomClassPathScanningCandidateComponentProvider(
-    classLoader: ClassLoader,
-): ClassPathScanningCandidateComponentProvider(false) {
-    init {
-        resourceLoader = DefaultResourceLoader(classLoader)
-    }
-
-    override fun isCandidateComponent(beanDefinition: AnnotatedBeanDefinition): Boolean {
-        // 元の実装だと抽象クラスやインターフェース (つまり Bean にできないもの) が対象外になってしまうので改造
-        return true
     }
 }

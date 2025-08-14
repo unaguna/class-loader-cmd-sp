@@ -1,8 +1,8 @@
 package jp.unaguna.classloader.sp.tree
 
-import org.springframework.beans.factory.config.BeanDefinition
+import jp.unaguna.classloader.sp.ClassFileMetadata
 
-class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefinition>() {
+class ExtendClassTree() : ClassTree<ClassFileMetadata>() {
     override val ignoreRoot: Boolean = true
     private val nameMap: MutableMap<String, ExtendTreeNode> = mutableMapOf()
     /** クラス名とそのクラスを継承するサブクラスのマップ */
@@ -18,23 +18,16 @@ class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefi
         return this.constRoot.hasNoChild()
     }
 
-    fun append(bd: BeanDefinition) {
-        val className = bd.beanClassName!!
+    fun append(el: ClassFileMetadata) {
+        val className = el.classMetadata.className
         // すでにツリーに入っているならなにもしない
         if (nameMap.contains(className)) {
             return
         }
 
-        val newNode = ExtendTreeNode(bd)
+        val newNode = ExtendTreeNode(el)
 
-        val cls = try {
-            classLoader.loadClass(className)
-        } catch (e: ClassNotFoundException) {
-            null
-        } catch (e: NoClassDefFoundError) {
-            null
-        }
-        val superClassName = cls?.superclass?.name ?: ""
+        val superClassName = el.classMetadata.superClassName ?: ""
 
         val existSuperClassNode = nameMap[superClassName]
         val existSubClassNodes = superClsNameMap[className] ?: emptyList()
@@ -62,27 +55,27 @@ class ExtendClassTree(private val classLoader: ClassLoader) : ClassTree<BeanDefi
 
     }
 
-    fun appendAll(bd: Iterable<BeanDefinition>) {
-        bd.forEach { append(it) }
+    fun appendAll(els: Iterable<ClassFileMetadata>) {
+        els.forEach { append(it) }
     }
 }
 
-class ExtendTreeNode(private val el: BeanDefinition?) : ClassTreeNode<BeanDefinition> {
+class ExtendTreeNode(private val el: ClassFileMetadata?) : ClassTreeNode<ClassFileMetadata> {
     var parentNode: ExtendTreeNode? = null
     val childNodes = mutableListOf<ExtendTreeNode>()
 
-    override val element: BeanDefinition
+    override val element: ClassFileMetadata
         get() = el ?: error("dummy element has been referenced")
 
-    override fun parent(): BeanDefinition? {
+    override fun parent(): ClassFileMetadata? {
         return this.parentNode?.element
     }
 
-    override fun parentNode(): ClassTreeNode<BeanDefinition>? {
+    override fun parentNode(): ClassTreeNode<ClassFileMetadata>? {
         return this.parentNode
     }
 
-    override fun children(): Iterable<BeanDefinition> {
+    override fun children(): Iterable<ClassFileMetadata> {
         return childNodes.map { it.element }
     }
 
