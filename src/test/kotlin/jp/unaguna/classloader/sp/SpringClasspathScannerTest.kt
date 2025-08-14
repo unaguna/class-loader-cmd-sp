@@ -15,7 +15,7 @@ class SpringClasspathScannerTest {
 
         println(result)
 
-        assertEquals(5, result.size)
+        assertEquals(8, result.size)
     }
 
     @Test
@@ -33,6 +33,25 @@ class SpringClasspathScannerTest {
         assertEquals(2, result.size)
         assertEquals(
             setOf("com.example.AbsSubClass", "com.example.BaseClass"),
+            result.map { it.className }.toSet(),
+        )
+    }
+
+    @Test
+    fun testScanByBaseInterface() {
+        val cpJarUrl = SpringClasspathScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
+        val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
+        val scanner = SpringClasspathScanner(classLoader).apply {
+            subclassOf(classLoader.loadClass("com.example.Interface"))
+        }
+
+        val result = scanner.scan().asSequence().toList()
+
+        println(result)
+
+        assertEquals(3, result.size)
+        assertEquals(
+            setOf("com.example.Interface", "com.example.SubInterface", "com.example.ImplClass"),
             result.map { it.className }.toSet(),
         )
     }
