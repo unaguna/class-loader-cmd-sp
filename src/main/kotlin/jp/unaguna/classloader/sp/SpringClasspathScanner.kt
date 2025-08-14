@@ -3,6 +3,7 @@ package jp.unaguna.classloader.sp
 import jp.unaguna.classloader.core.ClasspathScannerResettable
 import jp.unaguna.classloader.core.ScannedElement
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.context.annotation.ScannedGenericBeanDefinition
@@ -17,9 +18,7 @@ class SpringClasspathScanner(
     private var basePackage: String? = null
     private var classExtensionTree: Boolean = false
 
-    private val scanner = ClassPathScanningCandidateComponentProvider(false).apply {
-        resourceLoader = DefaultResourceLoader(classLoader)
-    }
+    private val scanner = CustomClassPathScanningCandidateComponentProvider(classLoader)
 
     override fun scan(): Iterator<SpringClasspathScannerElement> {
         return SpringClasspathScannerIterator(
@@ -87,4 +86,21 @@ class SpringClasspathScannerElement(
 
     override val isAbstract: Boolean
         get() = bd.metadata.isAbstract
+
+    override fun toString(): String {
+        return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
+    }
+}
+
+private class CustomClassPathScanningCandidateComponentProvider(
+    classLoader: ClassLoader,
+): ClassPathScanningCandidateComponentProvider(false) {
+    init {
+        resourceLoader = DefaultResourceLoader(classLoader)
+    }
+
+    override fun isCandidateComponent(beanDefinition: AnnotatedBeanDefinition): Boolean {
+        // 元の実装だと抽象クラスやインターフェース (つまり Bean にできないもの) が対象外になってしまうので改造
+        return true
+    }
 }
