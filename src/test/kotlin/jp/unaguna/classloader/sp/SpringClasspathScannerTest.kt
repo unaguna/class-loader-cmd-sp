@@ -17,6 +17,6 @@ class SpringClasspathScannerTest {
 
         println(result)
 
-        assertEquals(4, result.size)
+        assertEquals(5, result.size)
     }
 }
