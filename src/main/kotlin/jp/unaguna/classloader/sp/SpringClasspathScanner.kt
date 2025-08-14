@@ -2,6 +2,7 @@ package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClasspathScannerResettable
 import jp.unaguna.classloader.core.ScannedElement
+import jp.unaguna.classloader.sp.tree.ExtendClassTree
 import org.springframework.core.io.Resource
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.core.io.support.ResourcePatternResolver
@@ -71,10 +72,9 @@ private class SpringClasspathScannerIterator(
 ): Iterator<SpringClasspathScannerElement> {
     val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
-        TODO()
-        // ExtendClassTree(classLoader).apply { appendAll(scanned) }.iterator()
+        ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
     } else scanned.iterator().asSequence()
-        .map { Pair(it, 0) }
+        .map { Pair(loadMetadata(it), 0) }
         .iterator()
 
     var nextElement: SpringClasspathScannerElement? = null
@@ -83,18 +83,23 @@ private class SpringClasspathScannerIterator(
         calcNext()
     }
 
+    private fun loadMetadata(resource: Resource): ClassFileMetadata {
+        val metadataReader = metadataReaderFactory.getMetadataReader(resource)
+        val classMetadata = metadataReader.classMetadata
+
+        return ClassFileMetadata(resource, metadataReader, classMetadata)
+    }
+
     /**
      * Calc the next element and contain it into [nextElement]
      */
     private fun calcNext() {
         while (innerIterator.hasNext()) {
-            val (nextResource, depth) = innerIterator.next()
-            val metadataReader = metadataReaderFactory.getMetadataReader(nextResource)
-            val classMetadata = metadataReader.classMetadata
+            val (nextFileMetadata, depth) = innerIterator.next()
 
-            if (includeFilters.all { it.match(metadataReader, metadataReaderFactory) }) {
+            if (includeFilters.all { it.match(nextFileMetadata.metadataReader, metadataReaderFactory) }) {
                 nextElement = SpringClasspathScannerElement(
-                    ClassFileMetadata(nextResource, metadataReader, classMetadata),
+                    nextFileMetadata,
                     depth = depth,
                 )
                 return
