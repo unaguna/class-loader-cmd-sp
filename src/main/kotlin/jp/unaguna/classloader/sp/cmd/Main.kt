@@ -21,8 +21,13 @@ class Main {
             .build()
 
         commander.parse(*argv)
-        val subcommand = commander.parsedCommand
-        subcommands[subcommand]!!.execute(args)
+
+        if (args.help || commander.parsedCommand == null) {
+            commander.usage()
+            return
+        }
+
+        subcommands[commander.parsedCommand]!!.execute(args)
     }
 
     companion object {
