@@ -19,6 +19,9 @@ class LsClasses: SubCommand {
     @Parameter(names = ["--inherit"], description = "List only classes which extends or implements specified class")
     var inherit: String? = null
 
+    @Parameter(names = ["--ext-tree"], description = "Output classes as an extension tree")
+    var asExtendTree: Boolean = false
+
     override fun execute(commonArgs: CommonArgs) {
         val classpathStr = classpath ?: commonArgs.classpath
         val classpath = classpathStr?.let { classpathSpecToURLArray(it) }
@@ -32,7 +35,9 @@ class LsClasses: SubCommand {
             inherit?.let { inherit ->
                 subtypeOf(classLoader.loadClass(inherit))
             }
-//            asClassExtensionTree()
+            if (asExtendTree) {
+                asClassExtensionTree()
+            }
         }
 
         // 指定パッケージ配下をスキャン
