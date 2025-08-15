@@ -3,9 +3,8 @@ package jp.unaguna.classloader.sp
 import jp.unaguna.classloader.core.ClasspathScannerResettable
 import jp.unaguna.classloader.core.ScannedElement
 import jp.unaguna.classloader.core.Visibility
+import jp.unaguna.classloader.sp.metaloader.ClassStaticLoader
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
-import org.springframework.asm.ClassReader
-import org.springframework.asm.Opcodes
 import org.springframework.core.io.Resource
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.core.io.support.ResourcePatternResolver
@@ -146,28 +145,13 @@ class SpringClasspathScannerElement(
         get() = element.classMetadata.isAnnotation
 
     override val visibility: Visibility
-        get() = customMetadata.visibility
+        get() = staticClassData.visibility
 
-    private val customMetadata by lazy {
-        val access = element.resource.inputStream.use { inStream ->
-            val cr = ClassReader(inStream)
-            cr.access
-        }
-        CustomMetadata(
-            visibility = when {
-                (access and Opcodes.ACC_PUBLIC) != 0 -> Visibility.PUBLIC
-                (access and Opcodes.ACC_PRIVATE) != 0 -> Visibility.PRIVATE
-                (access and Opcodes.ACC_PROTECTED) != 0 -> Visibility.PROTECTED
-                else -> Visibility.PACKAGE_PRIVATE
-            },
-        )
+    private val staticClassData by lazy {
+        ClassStaticLoader().load(element.resource)
     }
 
     override fun toString(): String {
         return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
     }
 }
-
-private data class CustomMetadata(
-    val visibility: Visibility,
-)
