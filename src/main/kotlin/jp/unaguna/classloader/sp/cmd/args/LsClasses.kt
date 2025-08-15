@@ -29,6 +29,9 @@ class LsClasses: SubCommand {
     @Parameter(names = ["--ext-tree"], description = "output classes as an extension tree")
     var asExtendTree: Boolean = false
 
+    @Parameter(names = ["--source"], description = "output source path of class")
+    var showSource: Boolean = false
+
     override fun execute(commonArgs: CommonArgs) {
         val classpathStr = classpath ?: commonArgs.classpath
         val classpath = classpathStr?.let { classpathSpecToURLArray(it) }
@@ -50,6 +53,7 @@ class LsClasses: SubCommand {
         val lineFormatter = ClassFormatter(
             longFormat = longFormat || longLongFormat,
             longStatus = longLongFormat,
+            showSource = showSource,
         )
 
         // 指定パッケージ配下をスキャン

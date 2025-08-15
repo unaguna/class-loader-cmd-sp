@@ -5,7 +5,8 @@ import jp.unaguna.classloader.core.ScannedElement
 class ClassFormatter(
     longFormat: Boolean = false,
     longStatus: Boolean = false,
-    fieldSep: String = "\t"
+    private val showSource: Boolean = false,
+    private val fieldSep: String = "\t"
 ) {
     private val statusFormatter = when {
         longFormat && longStatus -> ClassMetaStatusFormatterLong(
@@ -23,6 +24,11 @@ class ClassFormatter(
 
             append("\t".repeat(scanned.depth))
             append(scanned.className)
+
+            if (showSource) {
+                append(fieldSep)
+                append(scanned.classSource)
+            }
         }
     }
 }
