@@ -11,5 +11,13 @@ interface ScannedElement<E> {
     val isInterface: Boolean
     val isFinal: Boolean
     val isAnnotation: Boolean
+    val visibility: Visibility
     // TODO: その他のメタデータ (参考: https://spring.pleiades.io/spring-framework/docs/current/javadoc-api/org/springframework/core/type/AnnotationMetadata.html)
+}
+
+enum class Visibility {
+    PUBLIC,
+    PACKAGE_PRIVATE,
+    PROTECTED,
+    PRIVATE,
 }
