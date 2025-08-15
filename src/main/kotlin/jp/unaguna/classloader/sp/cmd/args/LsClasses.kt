@@ -3,6 +3,7 @@ package jp.unaguna.classloader.sp.cmd.args
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import jp.unaguna.classloader.sp.SpringClasspathScanner
+import jp.unaguna.classloader.sp.cmd.ClassFormatter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
 import kotlin.collections.iterator
@@ -16,10 +17,13 @@ class LsClasses: SubCommand {
     @Parameter(names = ["-cp", "--classpath"], description = "The classpath to scan")
     var classpath: String? = null
 
-    @Parameter(names = ["--inherit"], description = "List only classes which extends or implements specified class")
+    @Parameter(names = ["--inherit"], description = "list only classes which extends or implements specified class")
     var inherit: String? = null
 
-    @Parameter(names = ["--ext-tree"], description = "Output classes as an extension tree")
+    @Parameter(names = ["-l"], description = "use a long listing format")
+    var longFormat: Boolean = false
+
+    @Parameter(names = ["--ext-tree"], description = "output classes as an extension tree")
     var asExtendTree: Boolean = false
 
     override fun execute(commonArgs: CommonArgs) {
@@ -40,9 +44,13 @@ class LsClasses: SubCommand {
             }
         }
 
+        val lineFormatter = ClassFormatter(
+            longFormat = longFormat,
+        )
+
         // 指定パッケージ配下をスキャン
         for (scanned in scanner.scan()) {
-            println("\t".repeat(scanned.depth) + scanned.className + "\t" + scanned.isAbstract)
+            println(lineFormatter.format(scanned))
         }
     }
 }
