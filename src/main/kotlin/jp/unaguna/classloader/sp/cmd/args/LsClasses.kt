@@ -30,7 +30,7 @@ class LsClasses: SubCommand {
 
         val scanner = SpringClasspathScanner(classLoader).apply {
             inherit?.let { inherit ->
-                subclassOf(classLoader.loadClass(inherit))
+                subtypeOf(classLoader.loadClass(inherit))
             }
 //            asClassExtensionTree()
         }

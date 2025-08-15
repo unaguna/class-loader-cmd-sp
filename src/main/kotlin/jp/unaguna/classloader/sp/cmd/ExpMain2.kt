@@ -9,7 +9,7 @@ fun main() {
     val classpath = classpathSpecToURLArray("C:\\programs\\class-loader-cmd-sandbox\\one.jar;C:\\programs\\class-loader-cmd-sandbox\\two.jar")
     val classLoader = URLClassLoader(classpath)//, null)
     val scanner = SpringClasspathScanner(classLoader).apply {
-        subclassOf(classLoader.loadClass("java.lang.Object"))
+        subtypeOf(classLoader.loadClass("java.lang.Object"))
         asClassExtensionTree()
     }
 

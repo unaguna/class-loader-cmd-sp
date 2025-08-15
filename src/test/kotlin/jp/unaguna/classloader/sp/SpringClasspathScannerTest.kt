@@ -23,7 +23,7 @@ class SpringClasspathScannerTest {
         val cpJarUrl = SpringClasspathScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringClasspathScanner(classLoader).apply {
-            subclassOf(classLoader.loadClass("com.example.BaseClass"))
+            subtypeOf(classLoader.loadClass("com.example.BaseClass"))
         }
 
         val result = scanner.scan().asSequence().toList()
@@ -42,7 +42,7 @@ class SpringClasspathScannerTest {
         val cpJarUrl = SpringClasspathScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringClasspathScanner(classLoader).apply {
-            subclassOf(classLoader.loadClass("com.example.Interface"))
+            subtypeOf(classLoader.loadClass("com.example.Interface"))
         }
 
         val result = scanner.scan().asSequence().toList()

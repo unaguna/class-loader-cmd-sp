@@ -39,7 +39,7 @@ class SpringClasspathScanner(
         includeFilters.clear()
     }
 
-    override fun subclassOf(cls: Class<*>) {
+    override fun subtypeOf(cls: Class<*>) {
         this.addIncludeFilter(AssignableTypeFilter(cls))
     }
 
