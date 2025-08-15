@@ -136,6 +136,9 @@ class SpringClasspathScannerElement(
     override val isInterface: Boolean
         get() = element.classMetadata.isInterface
 
+    override val isFinal: Boolean
+        get() = element.classMetadata.isFinal
+
     override fun toString(): String {
         return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
     }

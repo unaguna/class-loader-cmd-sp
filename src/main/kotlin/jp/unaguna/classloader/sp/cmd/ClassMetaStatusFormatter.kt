@@ -22,6 +22,10 @@ class ClassMetaStatusFormatterShort(
                 scanned.isAbstract -> "a"
                 else -> "c"
             })
+            append(when {
+                scanned.isFinal -> "f"
+                else -> "-"
+            })
             append(suffix)
         }
     }
@@ -37,6 +41,11 @@ class ClassMetaStatusFormatterLong(
                 scanned.isInterface -> "interface"
                 scanned.isAbstract ->  "abstract "
                 else ->                "concrete "
+            })
+            append(sep)
+            append(when {
+                scanned.isFinal -> "final"
+                else ->            "open "
             })
             append(suffix)
         }

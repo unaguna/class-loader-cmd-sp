@@ -9,5 +9,6 @@ interface ScannedElement<E> {
     val classSource: URL?
     val isAbstract: Boolean
     val isInterface: Boolean
+    val isFinal: Boolean
     // TODO: その他のメタデータ (参考: https://spring.pleiades.io/spring-framework/docs/current/javadoc-api/org/springframework/core/type/AnnotationMetadata.html)
 }
