@@ -26,3 +26,19 @@ class ClassMetaStatusFormatterShort(
         }
     }
 }
+
+class ClassMetaStatusFormatterLong(
+    private val sep: String = " ",
+    private val suffix: String = "",
+): ClassMetaStatusFormatter {
+    override fun format(scanned: ScannedElement<*>): String {
+        return buildString {
+            append(when {
+                scanned.isInterface -> "interface"
+                scanned.isAbstract ->  "abstract "
+                else ->                "concrete "
+            })
+            append(suffix)
+        }
+    }
+}

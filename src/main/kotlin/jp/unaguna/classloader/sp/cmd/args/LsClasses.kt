@@ -23,6 +23,9 @@ class LsClasses: SubCommand {
     @Parameter(names = ["-l"], description = "use a long listing format")
     var longFormat: Boolean = false
 
+    @Parameter(names = ["-ll"], description = "use a long-long listing format")
+    var longLongFormat: Boolean = false
+
     @Parameter(names = ["--ext-tree"], description = "output classes as an extension tree")
     var asExtendTree: Boolean = false
 
@@ -45,7 +48,8 @@ class LsClasses: SubCommand {
         }
 
         val lineFormatter = ClassFormatter(
-            longFormat = longFormat,
+            longFormat = longFormat || longLongFormat,
+            longStatus = longLongFormat,
         )
 
         // 指定パッケージ配下をスキャン

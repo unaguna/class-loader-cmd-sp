@@ -4,9 +4,13 @@ import jp.unaguna.classloader.core.ScannedElement
 
 class ClassFormatter(
     longFormat: Boolean = false,
+    longStatus: Boolean = false,
     fieldSep: String = "\t"
 ) {
     private val statusFormatter = when {
+        longFormat && longStatus -> ClassMetaStatusFormatterLong(
+            suffix = fieldSep,
+        )
         longFormat -> ClassMetaStatusFormatterShort(
             suffix = fieldSep,
         )
