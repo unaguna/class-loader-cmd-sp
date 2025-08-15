@@ -21,7 +21,7 @@ class ClassFormatter(
     private fun status(scanned: ScannedElement<*>): String {
         return buildString {
             append(when {
-                // TODO: isInterface -> "i"
+                scanned.isInterface -> "i"
                 scanned.isAbstract -> "a"
                 else -> "c"
             })
