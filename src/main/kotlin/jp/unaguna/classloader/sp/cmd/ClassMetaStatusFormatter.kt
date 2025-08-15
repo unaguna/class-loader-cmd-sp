@@ -18,6 +18,7 @@ class ClassMetaStatusFormatterShort(
     override fun format(scanned: ScannedElement<*>): String {
         return buildString {
             append(when {
+                scanned.isAnnotation -> "@"
                 scanned.isInterface -> "i"
                 scanned.isAbstract -> "a"
                 else -> "c"
@@ -38,9 +39,10 @@ class ClassMetaStatusFormatterLong(
     override fun format(scanned: ScannedElement<*>): String {
         return buildString {
             append(when {
-                scanned.isInterface -> "interface"
-                scanned.isAbstract ->  "abstract "
-                else ->                "concrete "
+                scanned.isAnnotation -> "annotation"
+                scanned.isInterface ->  "interface "
+                scanned.isAbstract ->   "abstract  "
+                else ->                 "concrete  "
             })
             append(sep)
             append(when {

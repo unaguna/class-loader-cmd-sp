@@ -139,6 +139,9 @@ class SpringClasspathScannerElement(
     override val isFinal: Boolean
         get() = element.classMetadata.isFinal
 
+    override val isAnnotation: Boolean
+        get() = element.classMetadata.isAnnotation
+
     override fun toString(): String {
         return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
     }
