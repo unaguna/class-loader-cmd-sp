@@ -16,6 +16,9 @@ class LsClasses: SubCommand {
     @Parameter(names = ["-cp", "--classpath"], description = "The classpath to scan")
     var classpath: String? = null
 
+    @Parameter(names = ["--inherit"], description = "List only classes which extends or implements specified class")
+    var inherit: String? = null
+
     override fun execute(commonArgs: CommonArgs) {
         val classpathStr = classpath ?: commonArgs.classpath
         val classpath = classpathStr?.let { classpathSpecToURLArray(it) }
@@ -26,7 +29,9 @@ class LsClasses: SubCommand {
         }
 
         val scanner = SpringClasspathScanner(classLoader).apply {
-//            subclassOf(classLoader.loadClass("java.lang.Object"))
+            inherit?.let { inherit ->
+                subclassOf(classLoader.loadClass(inherit))
+            }
 //            asClassExtensionTree()
         }
 
