@@ -14,6 +14,9 @@ import kotlin.collections.iterator
 class LsClasses: SubCommand {
     override val name = "ls-classes"
 
+    @Parameter(description = "[CLASS]...")
+    var classes: List<String> = mutableListOf()
+
     @Parameter(names = ["-cp", "--classpath"], description = "the classpath to scan", order = 0)
     var classpath: String? = null
 
@@ -24,14 +27,6 @@ class LsClasses: SubCommand {
         order = 100,
     )
     var inherit: String? = null
-
-    @Parameter(
-        names = ["--pattern"],
-        description = "list only classes whose names match the specified pattern",
-        category = "Condition",
-        order = 100,
-    )
-    var pattern: String? = null
 
     @Parameter(
         names = ["-l"],
@@ -68,8 +63,8 @@ class LsClasses: SubCommand {
             inherit?.let { inherit ->
                 subtypeOf(classLoader.loadClass(inherit))
             }
-            pattern?.let { pattern ->
-                pattern(pattern)
+            if (classes.isNotEmpty()) {
+                pattern(classes)
             }
             if (asExtendTree) {
                 asClassExtensionTree()
