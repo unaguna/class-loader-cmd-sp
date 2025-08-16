@@ -5,7 +5,7 @@ import org.springframework.core.type.classreading.MetadataReader
 import org.springframework.core.type.classreading.MetadataReaderFactory
 import org.springframework.core.type.filter.TypeFilter
 
-class NamePatternTypeFilter(patterns: Iterable<String>): TypeFilter {
+class NamePatternTypeFilter(patterns: Iterable<String>) : TypeFilter {
     private val patterns = patterns.toList()
     private val matcher = ClassNameGrobMatcher(ignoreCase = false)
 

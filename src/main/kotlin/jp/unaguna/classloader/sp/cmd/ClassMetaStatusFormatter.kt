@@ -7,7 +7,7 @@ interface ClassMetaStatusFormatter {
     fun format(scanned: ScannedElement<*>): String
 }
 
-class ClassMetaStatusFormatterNone: ClassMetaStatusFormatter {
+class ClassMetaStatusFormatterNone : ClassMetaStatusFormatter {
     override fun format(scanned: ScannedElement<*>): String {
         return ""
     }
@@ -15,25 +15,31 @@ class ClassMetaStatusFormatterNone: ClassMetaStatusFormatter {
 
 class ClassMetaStatusFormatterShort(
     private val suffix: String = "",
-): ClassMetaStatusFormatter {
+) : ClassMetaStatusFormatter {
     override fun format(scanned: ScannedElement<*>): String {
         return buildString {
-            append(when {
-                scanned.isAnnotation -> "@"
-                scanned.isInterface -> "i"
-                scanned.isAbstract -> "a"
-                else -> "c"
-            })
-            append(when (scanned.visibility) {
-                Visibility.PUBLIC -> "P"
-                Visibility.PRIVATE -> "p"
-                Visibility.PROTECTED -> "r"
-                Visibility.PACKAGE_PRIVATE -> "-"
-            })
-            append(when {
-                scanned.isFinal -> "f"
-                else -> "-"
-            })
+            append(
+                when {
+                    scanned.isAnnotation -> "@"
+                    scanned.isInterface -> "i"
+                    scanned.isAbstract -> "a"
+                    else -> "c"
+                }
+            )
+            append(
+                when (scanned.visibility) {
+                    Visibility.PUBLIC -> "P"
+                    Visibility.PRIVATE -> "p"
+                    Visibility.PROTECTED -> "r"
+                    Visibility.PACKAGE_PRIVATE -> "-"
+                }
+            )
+            append(
+                when {
+                    scanned.isFinal -> "f"
+                    else -> "-"
+                }
+            )
             append(suffix)
         }
     }
@@ -42,27 +48,33 @@ class ClassMetaStatusFormatterShort(
 class ClassMetaStatusFormatterLong(
     private val sep: String = " ",
     private val suffix: String = "",
-): ClassMetaStatusFormatter {
+) : ClassMetaStatusFormatter {
     override fun format(scanned: ScannedElement<*>): String {
         return buildString {
-            append(when {
-                scanned.isAnnotation -> "annotation"
-                scanned.isInterface ->  "interface "
-                scanned.isAbstract ->   "abstract  "
-                else ->                 "concrete  "
-            })
+            append(
+                when {
+                    scanned.isAnnotation -> "annotation"
+                    scanned.isInterface -> "interface "
+                    scanned.isAbstract -> "abstract  "
+                    else -> "concrete  "
+                }
+            )
             append(sep)
-            append(when (scanned.visibility) {
-                Visibility.PUBLIC ->          "public   "
-                Visibility.PRIVATE ->         "private  "
-                Visibility.PROTECTED ->       "protected"
-                Visibility.PACKAGE_PRIVATE -> "package  "
-            })
+            append(
+                when (scanned.visibility) {
+                    Visibility.PUBLIC -> "public   "
+                    Visibility.PRIVATE -> "private  "
+                    Visibility.PROTECTED -> "protected"
+                    Visibility.PACKAGE_PRIVATE -> "package  "
+                }
+            )
             append(sep)
-            append(when {
-                scanned.isFinal -> "final"
-                else ->            "open "
-            })
+            append(
+                when {
+                    scanned.isFinal -> "final"
+                    else -> "open "
+                }
+            )
             append(suffix)
         }
     }

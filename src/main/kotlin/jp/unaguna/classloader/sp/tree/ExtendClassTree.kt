@@ -5,6 +5,7 @@ import jp.unaguna.classloader.sp.ClassFileMetadata
 class ExtendClassTree() : ClassTree<ClassFileMetadata>() {
     override val ignoreRoot: Boolean = true
     private val nameMap: MutableMap<String, ExtendTreeNode> = mutableMapOf()
+
     /** クラス名とそのクラスを継承するサブクラスのマップ */
     private val superClsNameMap: MutableMap<String, MutableList<ExtendTreeNode>> = mutableMapOf()
     private val constRoot = ExtendTreeNode(null)
@@ -52,7 +53,6 @@ class ExtendClassTree() : ClassTree<ClassFileMetadata>() {
         }
         superClsNameMap.getOrPut(superClassName) { mutableListOf() }.add(newNode)
         nameMap[className] = newNode
-
     }
 
     fun appendAll(els: Iterable<ClassFileMetadata>) {

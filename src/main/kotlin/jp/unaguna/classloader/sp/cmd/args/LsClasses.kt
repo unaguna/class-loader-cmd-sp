@@ -11,7 +11,7 @@ import kotlin.collections.iterator
 @Parameters(
     commandDescription = "list classes in the classpath"
 )
-class LsClasses: SubCommand {
+class LsClasses : SubCommand {
     override val name = "ls-classes"
 
     @Parameter(description = "[CLASS]...")

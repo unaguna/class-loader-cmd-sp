@@ -10,15 +10,18 @@ abstract class ClassTree<E> {
         return ClassTreeIterator(this)
     }
 
-
-    private class ClassTreeIterator<E>(private val tree: ClassTree<E>): Iterator<Pair<E, Int>> {
+    private class ClassTreeIterator<E>(private val tree: ClassTree<E>) : Iterator<Pair<E, Int>> {
         val indexPath: ArrayDeque<Int> = ArrayDeque()
         var next: ClassTreeNode<E>? = if (tree.ignoreRoot) {
             if (tree.root?.hasChild() == true) {
                 indexPath.add(0)
                 tree.root!!.childNode(0)
-            } else null
-        } else tree.root
+            } else {
+                null
+            }
+        } else {
+            tree.root
+        }
 
         override fun next(): Pair<E, Int> {
             val node = next ?: throw NoSuchElementException()
@@ -59,7 +62,5 @@ abstract class ClassTree<E> {
         override fun hasNext(): Boolean {
             return this.next != null
         }
-
     }
-
 }

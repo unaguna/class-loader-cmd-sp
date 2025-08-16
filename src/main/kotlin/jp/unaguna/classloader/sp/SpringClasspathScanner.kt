@@ -17,7 +17,7 @@ import java.net.URL
 
 class SpringClasspathScanner(
     classLoader: ClassLoader,
-): ClasspathScannerResettable<ClassFileMetadata, SpringClasspathScannerElement> {
+) : ClasspathScannerResettable<ClassFileMetadata, SpringClasspathScannerElement> {
     private var basePackage: String? = null
     private var classExtensionTree: Boolean = false
     private val includeFilters: MutableList<TypeFilter> = mutableListOf()
@@ -58,9 +58,9 @@ class SpringClasspathScanner(
     }
 
     override fun clearConditions() {
-         this.resetIncludeFilter()
-         basePackage = null
-         classExtensionTree = false
+        this.resetIncludeFilter()
+        basePackage = null
+        classExtensionTree = false
     }
 }
 
@@ -75,13 +75,15 @@ private class SpringClasspathScannerIterator(
     resolver: ResourcePatternResolver,
     classExtensionTree: Boolean,
     private val includeFilters: List<TypeFilter>,
-): Iterator<SpringClasspathScannerElement> {
+) : Iterator<SpringClasspathScannerElement> {
     val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
         ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
-    } else scanned.iterator().asSequence()
-        .map { Pair(loadMetadata(it), 0) }
-        .iterator()
+    } else {
+        scanned.iterator().asSequence()
+            .map { Pair(loadMetadata(it), 0) }
+            .iterator()
+    }
 
     var nextElement: SpringClasspathScannerElement? = null
 
@@ -156,6 +158,6 @@ class SpringClasspathScannerElement(
     }
 
     override fun toString(): String {
-        return "${this.javaClass.simpleName}(${className}, depth = ${depth})"
+        return "${this.javaClass.simpleName}($className, depth = $depth)"
     }
 }

@@ -1,6 +1,6 @@
 package jp.unaguna.classloader.core
 
-interface ClasspathScanner<E, S: ScannedElement<E>> {
+interface ClasspathScanner<E, S : ScannedElement<E>> {
     fun scan(): Iterator<S>
     fun subtypeOf(cls: Class<*>)
     fun pattern(classNamePatterns: Iterable<String>)
@@ -8,6 +8,6 @@ interface ClasspathScanner<E, S: ScannedElement<E>> {
     fun asClassExtensionTree()
 }
 
-interface ClasspathScannerResettable<E, S: ScannedElement<E>> : ClasspathScanner<E, S> {
+interface ClasspathScannerResettable<E, S : ScannedElement<E>> : ClasspathScanner<E, S> {
     fun clearConditions()
 }
