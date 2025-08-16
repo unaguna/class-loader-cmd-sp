@@ -6,7 +6,7 @@ class ClassFormatter(
     private val longFormat: Boolean = false,
     longStatus: Boolean = false,
     private val showSource: Boolean = false,
-    private val fieldSep: String = "\t"
+    private val fieldSep: String = " "
 ) {
     private val statusFormatter = when {
         longFormat && longStatus -> ClassMetaStatusFormatterLong(
