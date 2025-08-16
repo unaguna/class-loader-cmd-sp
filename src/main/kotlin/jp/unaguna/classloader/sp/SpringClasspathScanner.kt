@@ -5,6 +5,7 @@ import jp.unaguna.classloader.core.ScannedElement
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.metaloader.ClassStaticLoader
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
+import jp.unaguna.classloader.sp.typefilter.NamePatternTypeFilter
 import org.springframework.core.io.Resource
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.core.io.support.ResourcePatternResolver

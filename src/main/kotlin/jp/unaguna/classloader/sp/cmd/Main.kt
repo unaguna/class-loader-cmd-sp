@@ -10,6 +10,7 @@ class Main {
         LsClasses(),
     ).associateBy { it.name }
 
+    @Suppress("SpreadOperator")
     fun run(argv: Array<String>) {
         val commander = JCommander.newBuilder()
             .apply {
@@ -31,6 +32,7 @@ class Main {
     }
 
     companion object {
+        @Suppress("MemberNameEqualsClassName")
         @JvmStatic
         fun main(argv: Array<String>) {
             Main().run(argv)

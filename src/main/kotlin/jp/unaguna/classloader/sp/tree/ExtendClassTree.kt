@@ -2,7 +2,7 @@ package jp.unaguna.classloader.sp.tree
 
 import jp.unaguna.classloader.sp.ClassFileMetadata
 
-class ExtendClassTree() : ClassTree<ClassFileMetadata>() {
+class ExtendClassTree : ClassTree<ClassFileMetadata>() {
     override val ignoreRoot: Boolean = true
     private val nameMap: MutableMap<String, ExtendTreeNode> = mutableMapOf()
 

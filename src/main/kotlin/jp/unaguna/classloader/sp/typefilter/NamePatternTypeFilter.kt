@@ -1,4 +1,4 @@
-package jp.unaguna.classloader.sp
+package jp.unaguna.classloader.sp.typefilter
 
 import jp.unaguna.classloader.ClassNameGrobMatcher
 import org.springframework.core.type.classreading.MetadataReader
