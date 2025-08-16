@@ -14,25 +14,45 @@ import kotlin.collections.iterator
 class LsClasses: SubCommand {
     override val name = "ls-classes"
 
-    @Parameter(names = ["-cp", "--classpath"], description = "The classpath to scan")
+    @Parameter(names = ["-cp", "--classpath"], description = "the classpath to scan", order = 0)
     var classpath: String? = null
 
-    @Parameter(names = ["--inherit"], description = "list only classes which extends or implements specified class")
+    @Parameter(
+        names = ["--inherit"],
+        description = "list only classes which extends or implements specified class",
+        category = "Condition",
+        order = 100,
+    )
     var inherit: String? = null
 
-    @Parameter(names = ["--pattern"], description = "list only classes whose names match the specified pattern")
+    @Parameter(
+        names = ["--pattern"],
+        description = "list only classes whose names match the specified pattern",
+        category = "Condition",
+        order = 100,
+    )
     var pattern: String? = null
 
-    @Parameter(names = ["-l"], description = "use a long listing format")
+    @Parameter(
+        names = ["-l"],
+        description = "use a long listing format",
+        category = "Format",
+        order = 200,
+    )
     var longFormat: Boolean = false
 
-    @Parameter(names = ["-ll"], description = "use a long-long listing format")
+    @Parameter(names = ["-ll"], description = "use a long-long listing format", category = "Format", order = 200)
     var longLongFormat: Boolean = false
 
-    @Parameter(names = ["--ext-tree"], description = "output classes as an extension tree")
+    @Parameter(
+        names = ["--ext-tree"],
+        description = "output classes as an extension tree",
+        category = "Format",
+        order = 220,
+    )
     var asExtendTree: Boolean = false
 
-    @Parameter(names = ["--source"], description = "output source path of class")
+    @Parameter(names = ["--source"], description = "output source path of class", category = "Format", order = 210)
     var showSource: Boolean = false
 
     override fun execute(commonArgs: CommonArgs) {
