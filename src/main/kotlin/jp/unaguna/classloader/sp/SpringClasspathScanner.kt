@@ -45,6 +45,10 @@ class SpringClasspathScanner(
         this.addIncludeFilter(AssignableTypeFilter(cls))
     }
 
+    override fun pattern(classNamePattern: String) {
+        this.addIncludeFilter(NamePatternTypeFilter(classNamePattern))
+    }
+
     override fun inPackage(basePackage: String) {
         this.basePackage = basePackage
     }

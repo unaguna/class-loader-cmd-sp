@@ -20,6 +20,9 @@ class LsClasses: SubCommand {
     @Parameter(names = ["--inherit"], description = "list only classes which extends or implements specified class")
     var inherit: String? = null
 
+    @Parameter(names = ["--pattern"], description = "list only classes whose names match the specified pattern")
+    var pattern: String? = null
+
     @Parameter(names = ["-l"], description = "use a long listing format")
     var longFormat: Boolean = false
 
@@ -44,6 +47,9 @@ class LsClasses: SubCommand {
         val scanner = SpringClasspathScanner(classLoader).apply {
             inherit?.let { inherit ->
                 subtypeOf(classLoader.loadClass(inherit))
+            }
+            pattern?.let { pattern ->
+                pattern(pattern)
             }
             if (asExtendTree) {
                 asClassExtensionTree()

@@ -3,6 +3,7 @@ package jp.unaguna.classloader.core
 interface ClasspathScanner<E, S: ScannedElement<E>> {
     fun scan(): Iterator<S>
     fun subtypeOf(cls: Class<*>)
+    fun pattern(classNamePattern: String)
     fun inPackage(basePackage: String)
     fun asClassExtensionTree()
 }
