@@ -7,17 +7,17 @@ import org.springframework.core.io.Resource
 
 class ClassStaticLoader {
     fun load(resource: Resource): StaticClassData {
-        val access = resource.inputStream.use { inStream ->
+        resource.inputStream.use { inStream ->
             val cr = ClassReader(inStream)
-            cr.access
+
+            return StaticClassData(
+                visibility = when {
+                    (cr.access and Opcodes.ACC_PUBLIC) != 0 -> Visibility.PUBLIC
+                    (cr.access and Opcodes.ACC_PRIVATE) != 0 -> Visibility.PRIVATE
+                    (cr.access and Opcodes.ACC_PROTECTED) != 0 -> Visibility.PROTECTED
+                    else -> Visibility.PACKAGE_PRIVATE
+                },
+            )
         }
-        return StaticClassData(
-            visibility = when {
-                (access and Opcodes.ACC_PUBLIC) != 0 -> Visibility.PUBLIC
-                (access and Opcodes.ACC_PRIVATE) != 0 -> Visibility.PRIVATE
-                (access and Opcodes.ACC_PROTECTED) != 0 -> Visibility.PROTECTED
-                else -> Visibility.PACKAGE_PRIVATE
-            },
-        )
     }
 }
