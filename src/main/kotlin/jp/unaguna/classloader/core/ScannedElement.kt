@@ -12,6 +12,8 @@ interface ScannedElement<E> {
     val isFinal: Boolean
     val isAnnotation: Boolean
     val visibility: Visibility
+    val major: Int
+    val minor: Int
 }
 
 enum class Visibility {

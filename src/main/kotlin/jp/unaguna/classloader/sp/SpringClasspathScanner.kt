@@ -154,6 +154,12 @@ class SpringClasspathScannerElement(
     override val visibility: Visibility
         get() = staticClassData.visibility
 
+    override val major: Int
+        get() = staticClassData.major
+
+    override val minor: Int
+        get() = staticClassData.minor
+
     private val staticClassData by lazy {
         ClassStaticLoader().load(element.resource)
     }

@@ -6,9 +6,13 @@ import org.springframework.asm.Opcodes
 import org.springframework.core.io.Resource
 
 class ClassStaticLoader {
+    @Suppress("MagicNumber")
     fun load(resource: Resource): StaticClassData {
         resource.inputStream.use { inStream ->
             val cr = ClassReader(inStream)
+
+            val minor = cr.readUnsignedShort(4)
+            val major = cr.readUnsignedShort(6)
 
             return StaticClassData(
                 visibility = when {
@@ -17,6 +21,8 @@ class ClassStaticLoader {
                     (cr.access and Opcodes.ACC_PROTECTED) != 0 -> Visibility.PROTECTED
                     else -> Visibility.PACKAGE_PRIVATE
                 },
+                major = major,
+                minor = minor,
             )
         }
     }
