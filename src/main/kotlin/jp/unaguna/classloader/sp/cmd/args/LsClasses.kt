@@ -2,6 +2,7 @@ package jp.unaguna.classloader.sp.cmd.args
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import jp.unaguna.classloader.cmd.validator.NonOption
 import jp.unaguna.classloader.sp.SpringClasspathScanner
 import jp.unaguna.classloader.sp.cmd.ClassFormatter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
@@ -14,7 +15,7 @@ import kotlin.collections.iterator
 class LsClasses : SubCommand {
     override val name = "ls-classes"
 
-    @Parameter(description = "[CLASS]...")
+    @Parameter(description = "[CLASS]...", validateWith = [NonOption::class])
     var classes: List<String> = mutableListOf()
 
     @Parameter(names = ["-cp", "--classpath"], description = "the classpath to scan", order = 0)
