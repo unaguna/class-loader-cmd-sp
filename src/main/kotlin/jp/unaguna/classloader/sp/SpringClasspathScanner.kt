@@ -165,6 +165,9 @@ class SpringClasspathScannerElement(
     override val minor: Int
         get() = staticClassData.minor
 
+    override val serialVersionUID: Long?
+        get() = staticClassData.serialVersionUID
+
     private val staticClassData by lazy {
         ClassStaticLoader().load(element.resource)
     }

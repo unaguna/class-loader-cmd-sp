@@ -14,6 +14,7 @@ interface ScannedElement<E> {
     val visibility: Visibility
     val major: Int
     val minor: Int
+    val serialVersionUID: Long?
 }
 
 enum class Visibility {

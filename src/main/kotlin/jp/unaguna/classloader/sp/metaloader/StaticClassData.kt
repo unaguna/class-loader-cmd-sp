@@ -6,4 +6,5 @@ data class StaticClassData(
     val visibility: Visibility,
     val major: Int,
     val minor: Int,
+    val serialVersionUID: Long?,
 )
