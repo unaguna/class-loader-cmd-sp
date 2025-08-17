@@ -6,6 +6,7 @@ import jp.unaguna.classloader.cmd.validator.NonOption
 import jp.unaguna.classloader.sp.SpringClasspathScanner
 import jp.unaguna.classloader.sp.cmd.ClassFormatter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
+import java.lang.ClassCastException
 import java.net.URLClassLoader
 import kotlin.collections.iterator
 
@@ -73,8 +74,8 @@ class LsClasses : SubCommand {
                 subtypeOf(classLoader.loadClass(inherit))
             }
             annotatedBy?.let { annotatedBy ->
-                val cls = classLoader.loadClass(annotatedBy) as Class<out Annotation>
-                annotatedBy(cls)
+                val cls = classLoader.loadClass(annotatedBy)
+                annotatedBy(assertClassIsAnnotation(cls))
             }
             if (classes.isNotEmpty()) {
                 pattern(classes)
@@ -94,5 +95,13 @@ class LsClasses : SubCommand {
         for (scanned in scanner.scan()) {
             println(lineFormatter.format(scanned))
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun assertClassIsAnnotation(cls: Class<*>): Class<out Annotation> {
+        if (!Annotation::class.java.isAssignableFrom(cls)) {
+            throw ClassCastException("${cls.name} is not Annotation")
+        }
+        return cls as Class<out Annotation>
     }
 }
