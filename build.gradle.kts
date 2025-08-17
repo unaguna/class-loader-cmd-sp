@@ -39,6 +39,8 @@ tasks {
     shadowJar {
         manifest {
             attributes["Main-Class"] = "jp.unaguna.classloader.sp.cmd.Main"
+            archiveBaseName = archiveBaseName.get().removeSuffix("-sp")
+            archiveClassifier = ""
         }
     }
 }
