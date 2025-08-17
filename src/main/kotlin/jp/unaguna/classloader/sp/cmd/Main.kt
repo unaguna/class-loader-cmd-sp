@@ -23,6 +23,11 @@ class Main {
 
         commander.parse(*argv)
 
+        if (!args.help && args.version) {
+            val version = Version().getVersion()
+            println("Class Loader Command ${version ?: ""}")
+            return
+        }
         if (args.help || commander.parsedCommand == null) {
             commander.usage()
             return

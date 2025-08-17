@@ -7,6 +7,16 @@ plugins {
 group = "jp.unaguna"
 version = "0.1.0"
 
+sourceSets {
+    main {
+        output.dir(
+            mapOf("builtBy" to "generateVersionProperties"),
+            layout.buildDirectory.dir("generated/resources"),
+        )
+    }
+}
+
+
 repositories {
     mavenCentral()
 }
@@ -36,4 +46,18 @@ tasks {
 detekt {
     buildUponDefaultConfig = true
     autoCorrect = true
+}
+
+tasks.register("generateVersionProperties") {
+    val outputDir = file(layout.buildDirectory.dir("generated/resources"))
+    inputs.property("version", version)
+    outputs.dir(outputDir)
+
+    doLast {
+        val versionProperties = file("$outputDir/class-loader-cmd/version.properties")
+        versionProperties.parentFile.mkdirs()
+        versionProperties.writeText("version=$version")
+    }
+}.also {
+    tasks.processResources { dependsOn(it) }
 }
