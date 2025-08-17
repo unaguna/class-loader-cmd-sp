@@ -12,6 +12,7 @@ import org.springframework.core.io.support.ResourcePatternResolver
 import org.springframework.core.type.ClassMetadata
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory
 import org.springframework.core.type.classreading.MetadataReader
+import org.springframework.core.type.filter.AnnotationTypeFilter
 import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.core.type.filter.TypeFilter
 import java.net.URL
@@ -44,6 +45,10 @@ class SpringClasspathScanner(
 
     override fun subtypeOf(cls: Class<*>) {
         this.addIncludeFilter(AssignableTypeFilter(cls))
+    }
+
+    override fun annotatedBy(cls: Class<out Annotation>) {
+        this.addIncludeFilter(AnnotationTypeFilter(cls, true))
     }
 
     override fun pattern(classNamePatterns: Iterable<String>) {

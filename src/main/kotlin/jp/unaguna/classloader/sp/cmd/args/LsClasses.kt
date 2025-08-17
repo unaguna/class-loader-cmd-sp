@@ -29,6 +29,14 @@ class LsClasses : SubCommand {
     var inherit: String? = null
 
     @Parameter(
+        names = ["--annotated-by"],
+        description = "list only classes annotated by specified annotation",
+        category = "Condition",
+        order = 100,
+    )
+    var annotatedBy: String? = null
+
+    @Parameter(
         names = ["-l"],
         description = "use a long listing format",
         category = "Format",
@@ -62,6 +70,10 @@ class LsClasses : SubCommand {
         val scanner = SpringClasspathScanner(classLoader).apply {
             inherit?.let { inherit ->
                 subtypeOf(classLoader.loadClass(inherit))
+            }
+            annotatedBy?.let { annotatedBy ->
+                val cls = classLoader.loadClass(annotatedBy) as Class<out Annotation>
+                annotatedBy(cls)
             }
             if (classes.isNotEmpty()) {
                 pattern(classes)
