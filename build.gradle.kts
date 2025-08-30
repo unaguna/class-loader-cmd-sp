@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "jp.unaguna"
-version = "0.2.0-SNAPSHOT"
+version = "0.2.0"
 
 sourceSets {
     main {
