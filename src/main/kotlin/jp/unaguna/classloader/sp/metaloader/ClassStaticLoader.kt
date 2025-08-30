@@ -58,5 +58,4 @@ class ClassStaticLoader {
             return super.visitField(access, name, descriptor, signature, value)
         }
     }
-
 }
