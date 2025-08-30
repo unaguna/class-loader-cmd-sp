@@ -61,6 +61,9 @@ class LsClasses : SubCommand {
     @Parameter(names = ["--source"], description = "output source path of class", category = "Format", order = 210)
     var showSource: Boolean = false
 
+    @Parameter(names = ["--format"], description = "format in printf specification", category = "Format", order = 211)
+    var format: String? = null
+
     override fun execute(commonArgs: CommonArgs) {
         val classpathStr = classpath ?: commonArgs.classpath
         val classpath = classpathStr?.let { classpathSpecToURLArray(it) }
@@ -86,7 +89,9 @@ class LsClasses : SubCommand {
             }
         }
 
-        val lineFormatter = createLineFormatter(
+        val lineFormatter = format?.let { format ->
+            createLineFormatter(format)
+        } ?: createLineFormatter(
             longFormat = longFormat || longLongFormat,
             longStatus = longLongFormat,
             showSource = showSource,
