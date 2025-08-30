@@ -52,6 +52,7 @@ fun createLineFormatter(
 fun createValueProviderAdapter(): ValueProviderAdapter<SpringClasspathScannerElement> {
     return ValueProviderAdapter.Builder<SpringClasspathScannerElement>().apply {
         addProvider("%c") { it.className }
+        addProvider("%C") { it.shortClassName }
         addProvider("%t") {
             when {
                 it.isAnnotation -> "annotation"

@@ -6,6 +6,7 @@ interface ScannedElement<E> {
     val element: E
     val depth: Int
     val className: String
+    val shortClassName: String
     val classSource: URL?
     val isAbstract: Boolean
     val isInterface: Boolean
