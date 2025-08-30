@@ -24,6 +24,7 @@ repositories {
 dependencies {
     implementation("org.springframework:spring-context:5.3.39")
     implementation("org.jcommander:jcommander:1.85")
+    implementation("jp.unaguna:data-format-builder:0.2.0")
     testImplementation(kotlin("test"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 }
