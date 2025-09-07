@@ -150,6 +150,15 @@ class SpringClasspathScannerElement(
         }
     }
 
+    override val packageName: String? by lazy {
+        val dot = className.lastIndexOf('.')
+        return@lazy if (dot < 0) {
+            null
+        } else {
+            className.substring(0, dot)
+        }
+    }
+
     override val classSource: URL?
         get() = element.resource.url
 
