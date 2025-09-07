@@ -2,7 +2,7 @@ package jp.unaguna.classloader.core
 
 import java.net.URL
 
-interface ScannedElement<E> {
+interface ScannedClassElement<E> {
     val element: E
     val depth: Int
     val className: String

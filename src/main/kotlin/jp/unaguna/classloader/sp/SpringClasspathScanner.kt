@@ -1,7 +1,7 @@
 package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClasspathScannerResettable
-import jp.unaguna.classloader.core.ScannedElement
+import jp.unaguna.classloader.core.ScannedClassElement
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.metaloader.ClassStaticLoader
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
@@ -137,7 +137,7 @@ private class SpringClasspathScannerIterator(
 class SpringClasspathScannerElement(
     override val element: ClassFileMetadata,
     override val depth: Int,
-) : ScannedElement<ClassFileMetadata> {
+) : ScannedClassElement<ClassFileMetadata> {
     override val className: String
         get() = element.classMetadata.className
 
