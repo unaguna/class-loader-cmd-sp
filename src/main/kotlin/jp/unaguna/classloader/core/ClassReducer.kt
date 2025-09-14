@@ -32,6 +32,22 @@ abstract class ClassCounter<E, S : ScannedClassElement<E>> : ClassReducer<E, S, 
     }
 }
 
+abstract class ClassMaximumReducer<E, S : ScannedClassElement<E>, R : Comparable<R>> : ClassReducer<E, S, R> {
+    open val initialValue: R? = null
+    private var maximum = initialValue
+    override val value
+        get() = maximum ?: throw NoSuchElementException()
+
+    override fun apply(element: S) {
+        val targetValue = targetValueOf(element)
+        if (maximum == null || maximum!! < targetValue) {
+            maximum = targetValue
+        }
+    }
+
+    abstract fun targetValueOf(element: S): R
+}
+
 interface ClassReducerFactory<E, S : ScannedClassElement<E>, R> {
     /**
      * reducer の種類を表す。

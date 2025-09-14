@@ -1,12 +1,16 @@
 package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClassCounter
+import jp.unaguna.classloader.core.ClassMaximumReducer
+import jp.unaguna.classloader.core.ClassReducer
 import jp.unaguna.classloader.core.ClassReducerFactory
 import jp.unaguna.classloader.core.ClassReducerType
+import jp.unaguna.classloader.core.JavaVersion
 
 sealed class SpringClassReducerType<R> : ClassReducerType<R> {
     object CountAll : SpringClassReducerType<Int>()
     object CountConcrete : SpringClassReducerType<Int>()
+    object MaxJavaVersion : SpringClassReducerType<JavaVersion>()
 }
 
 sealed class SpringClassReducerFactory<R> :
@@ -38,6 +42,22 @@ class SpringConcreteClassCounterFactory : SpringClassReducerFactory<Int>() {
         override val type = SpringClassReducerType.CountConcrete
         override fun matches(element: SpringClasspathScannerElement): Boolean {
             return element.isConcrete
+        }
+    }
+}
+
+class SpringMaxJavaVersionClassReducerFactory : SpringClassReducerFactory<JavaVersion>() {
+    override val type = SpringClassReducerType.MaxJavaVersion
+
+    override fun create(): ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, JavaVersion> {
+        return SpringMaxJavaVersionClassReducer()
+    }
+
+    private class SpringMaxJavaVersionClassReducer :
+        ClassMaximumReducer<ClassFileMetadata, SpringClasspathScannerElement, JavaVersion>() {
+        override val type = SpringClassReducerType.MaxJavaVersion
+        override fun targetValueOf(element: SpringClasspathScannerElement): JavaVersion {
+            return element.javaVersion
         }
     }
 }

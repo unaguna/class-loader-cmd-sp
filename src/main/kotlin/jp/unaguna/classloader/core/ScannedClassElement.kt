@@ -18,6 +18,7 @@ interface ScannedClassElement<E> {
     val visibility: Visibility
     val major: Int
     val minor: Int
+    val javaVersion: JavaVersion
     val serialVersionUID: Long?
 }
 

@@ -1,6 +1,7 @@
 package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClasspathScannerResettable
+import jp.unaguna.classloader.core.JavaVersion
 import jp.unaguna.classloader.core.ScannedClassElement
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.metaloader.ClassStaticLoader
@@ -182,6 +183,9 @@ class SpringClasspathScannerElement(
 
     override val minor: Int
         get() = staticClassData.minor
+
+    override val javaVersion: JavaVersion
+        get() = JavaVersion(major, minor)
 
     override val serialVersionUID: Long?
         get() = staticClassData.serialVersionUID
