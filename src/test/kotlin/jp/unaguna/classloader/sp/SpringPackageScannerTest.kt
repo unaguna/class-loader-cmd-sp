@@ -18,4 +18,21 @@ class SpringPackageScannerTest {
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
     }
+
+    @Test
+    fun testScanWithAllCounter() {
+        val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
+        val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
+        val scanner = SpringPackageScanner(classLoader).apply {
+            applyClassCounter(SpringClassAllCounterFactory())
+        }
+
+        val result = scanner.scan().asSequence().toList()
+
+        println(result)
+
+        assertEquals(1, result.size)
+        assertEquals("com.example", result[0].packageName)
+        assertEquals(8, result[0].getClassCount(SpringClassCounterType.ALL))
+    }
 }

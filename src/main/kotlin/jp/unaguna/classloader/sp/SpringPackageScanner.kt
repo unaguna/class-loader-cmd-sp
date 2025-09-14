@@ -7,9 +7,15 @@ import jp.unaguna.classloader.core.ScannedPackageElement
 
 class SpringPackageScanner(
     classLoader: ClassLoader,
-) : PackageScanner<String, ClassFileMetadata, SpringPackageScannerElement, SpringClasspathScannerElement> {
+) : PackageScanner<
+    String,
+    ClassFileMetadata,
+    SpringPackageScannerElement,
+    SpringClasspathScannerElement,
+    SpringClassCounterType
+    > {
     private val classCounterFactories: MutableSet<
-        ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement>
+        ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>
         > = mutableSetOf()
     private val classpathScanner = SpringClasspathScanner(classLoader)
 
@@ -39,25 +45,37 @@ class SpringPackageScanner(
         }
     }
 
-    override fun applyClassCounter(counter: ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement>) {
-        this.classCounterFactories.add(counter)
+    override fun applyClassCounter(
+        counterFactory: ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>,
+    ) {
+        this.classCounterFactories.add(counterFactory)
     }
 }
 
 class SpringPackageScannerElement(
     override val element: String,
-) : ScannedPackageElement<String> {
-    private val classCounter: MutableList<ClassCounter<ClassFileMetadata, SpringClasspathScannerElement>> =
-        mutableListOf()
+) : ScannedPackageElement<String, SpringClassCounterType> {
+    private val classCounter: MutableMap<
+        SpringClassCounterType,
+        ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>
+        > = mutableMapOf()
 
     override val packageName: String
         get() = element
 
-    fun applyCounter(counter: ClassCounter<ClassFileMetadata, SpringClasspathScannerElement>) {
-        classCounter.add(counter)
+    override fun getClassCount(condition: SpringClassCounterType): Int {
+        val counter = this.classCounter[condition]
+            ?: throw IllegalArgumentException(condition.toString())
+
+        return counter.count
     }
 
-    internal fun getClassCounters(): List<ClassCounter<ClassFileMetadata, SpringClasspathScannerElement>> {
-        return classCounter
+    fun applyCounter(counter: ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>) {
+        classCounter[counter.type] = counter
+    }
+
+    internal fun getClassCounters():
+        List<ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>> {
+        return classCounter.values.toList()
     }
 }
