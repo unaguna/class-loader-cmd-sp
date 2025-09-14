@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test
 import java.net.URLClassLoader
 import kotlin.test.assertEquals
 
-class SpringResourceScannerTest {
+class SpringPackageScannerTest {
     @Test
     fun testScanAll() {
-        val cpJarUrl = SpringResourceScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
+        val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringPackageScanner(classLoader)
 
