@@ -13,6 +13,8 @@ interface ScannedClassElement<E> {
     val isInterface: Boolean
     val isFinal: Boolean
     val isAnnotation: Boolean
+    val isConcrete: Boolean
+        get() = !isAbstract
     val visibility: Visibility
     val major: Int
     val minor: Int
