@@ -50,7 +50,7 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(8, result[0].getClassReducedValue(SpringClassReducerType.ALL))
+        assertEquals(8, result[0].getClassReducedValue(SpringClassReducerType.CountAll))
     }
 
     @Test
@@ -67,7 +67,7 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(3, result[0].getClassReducedValue(SpringClassReducerType.CONCRETE))
+        assertEquals(3, result[0].getClassReducedValue(SpringClassReducerType.CountConcrete))
     }
 
     @Test
@@ -85,8 +85,8 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(8, result[0].getClassReducedValue(SpringClassReducerType.ALL))
-        assertEquals(3, result[0].getClassReducedValue(SpringClassReducerType.CONCRETE))
+        assertEquals(8, result[0].getClassReducedValue(SpringClassReducerType.CountAll))
+        assertEquals(3, result[0].getClassReducedValue(SpringClassReducerType.CountConcrete))
     }
 
     @Test
@@ -104,8 +104,8 @@ class SpringPackageScannerTest {
         assertEquals(1, result.size)
         val resultOne = result[0]
         val actualExc = assertThrows<IllegalArgumentException> {
-            resultOne.getClassReducedValue(SpringClassReducerType.ALL)
+            resultOne.getClassReducedValue(SpringClassReducerType.CountAll)
         }
-        assertEquals(actualExc.message, SpringClassReducerType.ALL.toString())
+        assertEquals(actualExc.message, SpringClassReducerType.CountAll.toString())
     }
 }
