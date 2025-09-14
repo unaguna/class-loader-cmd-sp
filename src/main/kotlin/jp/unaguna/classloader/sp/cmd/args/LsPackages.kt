@@ -6,6 +6,7 @@ import jp.unaguna.classloader.cmd.validator.NonOption
 import jp.unaguna.classloader.sp.SpringPackageScanner
 import jp.unaguna.classloader.sp.cmd.createPackageLineFormatter
 import jp.unaguna.classloader.sp.cmd.createPackageValueProviderAdapter
+import jp.unaguna.classloader.sp.cmd.packageLineFormatterVariableReducerMap
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
 
@@ -40,7 +41,11 @@ class LsPackages : SubCommand {
             if (packages.isNotEmpty()) {
                 pattern(packages)
             }
-            // TODO: apply reducer
+            for (variableName in lineFormatter.variableNames) {
+                val reducerType = packageLineFormatterVariableReducerMap[variableName]
+                    ?: continue
+                applyClassReducer(reducerType)
+            }
         }
 
         // 指定パッケージ配下をスキャン

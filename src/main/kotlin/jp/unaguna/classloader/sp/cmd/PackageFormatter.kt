@@ -11,11 +11,15 @@ fun createPackageLineFormatter(
     return DataFormat.fromPrintfFormat(format ?: "%P")
 }
 
+val packageLineFormatterVariableReducerMap = mapOf<String, SpringClassReducerType<*>>(
+    "%V" to SpringClassReducerType.MaxJavaVersion,
+)
+
 @Suppress("CyclomaticComplexMethod")
 fun createPackageValueProviderAdapter(): ValueProviderAdapter<SpringPackageScannerElement> {
     return ValueProviderAdapter.Builder<SpringPackageScannerElement>().apply {
         addProvider("%V") {
-            it.getClassReducedValue(SpringClassReducerType.MaxJavaVersion)
+            it.getClassReducedValue(packageLineFormatterVariableReducerMap["%V"]!!)
         }
         addProvider("%P") { it.packageName }
     }.build()
