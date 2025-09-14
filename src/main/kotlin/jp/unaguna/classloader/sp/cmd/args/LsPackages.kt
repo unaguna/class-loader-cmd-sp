@@ -4,9 +4,10 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import jp.unaguna.classloader.cmd.validator.NonOption
 import jp.unaguna.classloader.sp.SpringPackageScanner
+import jp.unaguna.classloader.sp.cmd.createPackageLineFormatter
+import jp.unaguna.classloader.sp.cmd.createPackageValueProviderAdapter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
 import java.net.URLClassLoader
-import kotlin.collections.iterator
 
 @Parameters(
     commandDescription = "list packages in the classpath"
@@ -20,6 +21,9 @@ class LsPackages : SubCommand {
     @Parameter(names = ["-cp", "--classpath"], description = "the classpath to scan", order = 0)
     var classpath: String? = null
 
+    @Parameter(names = ["--format"], description = "format in printf specification", category = "Format", order = 211)
+    var format: String? = null
+
     override fun execute(commonArgs: CommonArgs) {
         val classpathStr = classpath ?: commonArgs.classpath
         val classpath = classpathStr?.let { classpathSpecToURLArray(it) }
@@ -29,15 +33,20 @@ class LsPackages : SubCommand {
             javaClass.classLoader
         }
 
+        val lineFormatter = createPackageLineFormatter(format)
+
+        val scannedAdapter = createPackageValueProviderAdapter()
         val scanner = SpringPackageScanner(classLoader).apply {
             if (packages.isNotEmpty()) {
                 pattern(packages)
             }
+            // TODO: apply reducer
         }
 
         // 指定パッケージ配下をスキャン
         for (scanned in scanner.scan()) {
-            println(scanned.packageName)
+            scannedAdapter.setElement(scanned)
+            println(lineFormatter.format(scannedAdapter))
         }
     }
 }

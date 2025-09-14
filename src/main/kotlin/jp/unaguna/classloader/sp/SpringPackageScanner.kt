@@ -51,6 +51,10 @@ class SpringPackageScanner(
         this.classReducerFactories.add(reducerFactory)
     }
 
+    fun applyClassReducer(reducerType: SpringClassReducerType<*>) {
+        this.applyClassReducer(reducerType.createFactory())
+    }
+
     override fun pattern(packageNamePatterns: Iterable<String>) {
         classpathScanner.pattern(packageNamePatterns.map { "$it.*" })
     }

@@ -8,9 +8,23 @@ import jp.unaguna.classloader.core.ClassReducerType
 import jp.unaguna.classloader.core.JavaVersion
 
 sealed class SpringClassReducerType<R> : ClassReducerType<R> {
-    object CountAll : SpringClassReducerType<Int>()
-    object CountConcrete : SpringClassReducerType<Int>()
-    object MaxJavaVersion : SpringClassReducerType<JavaVersion>()
+    object CountAll : SpringClassReducerType<Int>() {
+        override fun createFactory(): SpringClassReducerFactory<Int> {
+            return SpringClassAllCounterFactory()
+        }
+    }
+    object CountConcrete : SpringClassReducerType<Int>() {
+        override fun createFactory(): SpringClassReducerFactory<Int> {
+            return SpringConcreteClassCounterFactory()
+        }
+    }
+    object MaxJavaVersion : SpringClassReducerType<JavaVersion>() {
+        override fun createFactory(): SpringClassReducerFactory<JavaVersion> {
+            return SpringMaxJavaVersionClassReducerFactory()
+        }
+    }
+
+    abstract fun createFactory(): SpringClassReducerFactory<R>
 }
 
 sealed class SpringClassReducerFactory<R> :
