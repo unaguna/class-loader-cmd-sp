@@ -28,7 +28,7 @@ fun createLineFormatter(
         }
 
         if (longFormat) {
-            append("%M %m")
+            append("%M.%m")
             append(fieldSep)
         }
 
