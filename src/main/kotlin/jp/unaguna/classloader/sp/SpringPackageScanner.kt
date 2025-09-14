@@ -50,6 +50,10 @@ class SpringPackageScanner(
     ) {
         this.classCounterFactories.add(counterFactory)
     }
+
+    override fun pattern(packageNamePatterns: Iterable<String>) {
+        classpathScanner.pattern(packageNamePatterns.map { "$it.*" })
+    }
 }
 
 class SpringPackageScannerElement(

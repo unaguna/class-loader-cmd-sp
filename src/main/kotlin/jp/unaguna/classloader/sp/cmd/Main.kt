@@ -3,11 +3,13 @@ package jp.unaguna.classloader.sp.cmd
 import com.beust.jcommander.JCommander
 import jp.unaguna.classloader.sp.cmd.args.CommonArgs
 import jp.unaguna.classloader.sp.cmd.args.LsClasses
+import jp.unaguna.classloader.sp.cmd.args.LsPackages
 
 class Main {
     val args = CommonArgs()
     val subcommands = listOf(
         LsClasses(),
+        LsPackages(),
     ).associateBy { it.name }
 
     @Suppress("SpreadOperator")
