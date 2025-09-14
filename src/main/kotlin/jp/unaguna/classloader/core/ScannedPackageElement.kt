@@ -1,6 +1,6 @@
 package jp.unaguna.classloader.core
 
-interface ScannedPackageElement<E, CT> {
+interface ScannedPackageElement<E> {
     val element: E
     val packageName: String
 
@@ -9,5 +9,5 @@ interface ScannedPackageElement<E, CT> {
      *
      * @throws IllegalArgumentException If the count cannot be done under the specified condition
      */
-    fun getClassReducedValueInt(condition: CT): Int
+    fun <R> getClassReducedValue(condition: ClassReducerType<R>): R
 }

@@ -1,18 +1,22 @@
 package jp.unaguna.classloader.core
 
-interface ClassReducer<E, S : ScannedClassElement<E>, CT, R> {
+interface ClassReducerType<R> {
+    val resultCls: Class<R>
+}
+
+interface ClassReducer<E, S : ScannedClassElement<E>, R> {
     /**
      * reducer の種類を表す。
      *
      * この値が同一であれば、同一のクラス群に対して同じ計算結果を出さなくてはならない。
      */
-    val type: CT
+    val type: ClassReducerType<R>
     val value: R
 
     fun apply(element: S)
 }
 
-abstract class ClassCounter<E, S : ScannedClassElement<E>, CT>: ClassReducer<E, S, CT, Int> {
+abstract class ClassCounter<E, S : ScannedClassElement<E>> : ClassReducer<E, S, Int> {
     private var cnt: Int = 0
     override val value: Int
         get() = cnt
@@ -30,13 +34,13 @@ abstract class ClassCounter<E, S : ScannedClassElement<E>, CT>: ClassReducer<E, 
     }
 }
 
-interface ClassReducerFactory<E, S : ScannedClassElement<E>, CT, R> {
+interface ClassReducerFactory<E, S : ScannedClassElement<E>, R> {
     /**
      * reducer の種類を表す。
      *
      * このファクトリが生成する reducer の type も同一の値である必要がある。
      */
-    val type: CT
+    val type: ClassReducerType<R>
 
-    fun create(): ClassReducer<E, S, CT, R>
+    fun create(): ClassReducer<E, S, R>
 }

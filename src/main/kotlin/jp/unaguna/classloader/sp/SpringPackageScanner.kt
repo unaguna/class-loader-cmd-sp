@@ -2,6 +2,7 @@ package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClassReducer
 import jp.unaguna.classloader.core.ClassReducerFactory
+import jp.unaguna.classloader.core.ClassReducerType
 import jp.unaguna.classloader.core.PackageScanner
 import jp.unaguna.classloader.core.ScannedPackageElement
 
@@ -12,10 +13,9 @@ class SpringPackageScanner(
     ClassFileMetadata,
     SpringPackageScannerElement,
     SpringClasspathScannerElement,
-    SpringClassCounterType
     > {
     private val classReducerFactories: MutableSet<
-            ClassReducerFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>
+        ClassReducerFactory<ClassFileMetadata, SpringClasspathScannerElement, *>
         > = mutableSetOf()
     private val classpathScanner = SpringClasspathScanner(classLoader)
 
@@ -46,9 +46,7 @@ class SpringPackageScanner(
     }
 
     override fun applyClassReducer(
-        reducerFactory: ClassReducerFactory<
-                ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *
-        >,
+        reducerFactory: ClassReducerFactory<ClassFileMetadata, SpringClasspathScannerElement, *>,
     ) {
         this.classReducerFactories.add(reducerFactory)
     }
@@ -60,32 +58,30 @@ class SpringPackageScanner(
 
 class SpringPackageScannerElement(
     override val element: String,
-) : ScannedPackageElement<String, SpringClassCounterType> {
+) : ScannedPackageElement<String> {
     private val classReducer: MutableMap<
-        SpringClassCounterType,
-        ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>
+        ClassReducerType<*>,
+        ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, *>
         > = mutableMapOf()
 
     override val packageName: String
         get() = element
 
-    override fun getClassReducedValueInt(condition: SpringClassCounterType): Int {
+    override fun <R> getClassReducedValue(condition: ClassReducerType<R>): R {
         val counter = this.classReducer[condition]
             ?: throw IllegalArgumentException(condition.toString())
 
-        val value = counter.value as Int
-
-        return value
+        return counter.value as? R
+            ?: throw ClassCastException()
     }
 
     fun applyReducer(
-        reducer: ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>,
+        reducer: ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, *>,
     ) {
         classReducer[reducer.type] = reducer
     }
 
-    internal fun getClassReducers():
-        List<ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>> {
+    internal fun getClassReducers(): List<ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, *>> {
         return classReducer.values.toList()
     }
 }
