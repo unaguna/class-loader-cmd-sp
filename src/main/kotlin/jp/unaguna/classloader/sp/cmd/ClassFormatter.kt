@@ -5,7 +5,7 @@ import jp.unaguna.classloader.sp.SpringClasspathScannerElement
 import jp.unaguna.fmtbuilder.DataFormat
 import jp.unaguna.fmtbuilder.ValueProviderAdapter
 
-fun createLineFormatter(
+fun createClassLineFormatter(
     longFormat: Boolean = false,
     longStatus: Boolean = false,
     showSource: Boolean = false,
@@ -39,17 +39,17 @@ fun createLineFormatter(
             append("%r")
         }
     }
-    return createLineFormatter(format)
+    return createClassLineFormatter(format)
 }
 
-fun createLineFormatter(
+fun createClassLineFormatter(
     format: String,
 ): DataFormat {
     return DataFormat.fromPrintfFormat(format)
 }
 
 @Suppress("CyclomaticComplexMethod")
-fun createValueProviderAdapter(): ValueProviderAdapter<SpringClasspathScannerElement> {
+fun createClassValueProviderAdapter(): ValueProviderAdapter<SpringClasspathScannerElement> {
     return ValueProviderAdapter.Builder<SpringClasspathScannerElement>().apply {
         addProvider("%c") { it.className }
         addProvider("%C") { it.shortClassName }
