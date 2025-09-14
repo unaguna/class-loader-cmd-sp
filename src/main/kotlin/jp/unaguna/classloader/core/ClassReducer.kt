@@ -1,8 +1,6 @@
 package jp.unaguna.classloader.core
 
-interface ClassReducerType<R> {
-    val resultCls: Class<R>
-}
+interface ClassReducerType<R>
 
 interface ClassReducer<E, S : ScannedClassElement<E>, R> {
     /**

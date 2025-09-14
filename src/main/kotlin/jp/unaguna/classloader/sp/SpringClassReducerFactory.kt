@@ -5,12 +5,8 @@ import jp.unaguna.classloader.core.ClassReducerFactory
 import jp.unaguna.classloader.core.ClassReducerType
 
 sealed class SpringClassCounterType<R> : ClassReducerType<R> {
-    object ALL : SpringClassCounterType<Int>() {
-        override val resultCls = Int::class.java
-    }
-    object CONCRETE : SpringClassCounterType<Int>() {
-        override val resultCls = Int::class.java
-    }
+    object ALL : SpringClassCounterType<Int>()
+    object CONCRETE : SpringClassCounterType<Int>()
 }
 
 sealed class SpringClassReducerFactory<R> :
