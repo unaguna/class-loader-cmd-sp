@@ -12,12 +12,16 @@ fun createPackageLineFormatter(
 }
 
 val packageLineFormatterVariableReducerMap = mapOf<String, SpringClassReducerType<*>>(
+    "%c" to SpringClassReducerType.CountAll,
     "%V" to SpringClassReducerType.MaxJavaVersion,
 )
 
 @Suppress("CyclomaticComplexMethod")
 fun createPackageValueProviderAdapter(): ValueProviderAdapter<SpringPackageScannerElement> {
     return ValueProviderAdapter.Builder<SpringPackageScannerElement>().apply {
+        addProvider("%c") {
+            it.getClassReducedValue(packageLineFormatterVariableReducerMap["%c"]!!)
+        }
         addProvider("%V") {
             it.getClassReducedValue(packageLineFormatterVariableReducerMap["%V"]!!)
         }
