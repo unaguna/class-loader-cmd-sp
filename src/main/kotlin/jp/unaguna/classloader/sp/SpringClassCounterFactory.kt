@@ -1,17 +1,17 @@
 package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClassCounter
-import jp.unaguna.classloader.core.ClassCounterFactory
+import jp.unaguna.classloader.core.ClassReducerFactory
 
 enum class SpringClassCounterType {
     ALL,
     CONCRETE,
 }
 
-sealed class SpringClassCounterFactory :
-    ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>
+sealed class SpringClassReducerFactory<R> :
+    ClassReducerFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, R>
 
-class SpringClassAllCounterFactory : SpringClassCounterFactory() {
+class SpringClassAllCounterFactory : SpringClassReducerFactory<Int>() {
     override val type = SpringClassCounterType.ALL
 
     override fun create(): ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType> {
@@ -27,7 +27,7 @@ class SpringClassAllCounterFactory : SpringClassCounterFactory() {
     }
 }
 
-class SpringConcreteClassCounterFactory : SpringClassCounterFactory() {
+class SpringConcreteClassCounterFactory : SpringClassReducerFactory<Int>() {
     override val type = SpringClassCounterType.CONCRETE
 
     override fun create(): ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType> {

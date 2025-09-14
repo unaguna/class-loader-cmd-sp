@@ -41,7 +41,7 @@ class SpringPackageScannerTest {
         val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringPackageScanner(classLoader).apply {
-            applyClassCounter(SpringClassAllCounterFactory())
+            applyClassReducer(SpringClassAllCounterFactory())
         }
 
         val result = scanner.scan().asSequence().toList()
@@ -50,7 +50,7 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(8, result[0].getClassCount(SpringClassCounterType.ALL))
+        assertEquals(8, result[0].getClassReducedValueInt(SpringClassCounterType.ALL))
     }
 
     @Test
@@ -58,7 +58,7 @@ class SpringPackageScannerTest {
         val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringPackageScanner(classLoader).apply {
-            applyClassCounter(SpringConcreteClassCounterFactory())
+            applyClassReducer(SpringConcreteClassCounterFactory())
         }
 
         val result = scanner.scan().asSequence().toList()
@@ -67,7 +67,7 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(3, result[0].getClassCount(SpringClassCounterType.CONCRETE))
+        assertEquals(3, result[0].getClassReducedValueInt(SpringClassCounterType.CONCRETE))
     }
 
     @Test
@@ -75,8 +75,8 @@ class SpringPackageScannerTest {
         val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringPackageScanner(classLoader).apply {
-            applyClassCounter(SpringClassAllCounterFactory())
-            applyClassCounter(SpringConcreteClassCounterFactory())
+            applyClassReducer(SpringClassAllCounterFactory())
+            applyClassReducer(SpringConcreteClassCounterFactory())
         }
 
         val result = scanner.scan().asSequence().toList()
@@ -85,8 +85,8 @@ class SpringPackageScannerTest {
 
         assertEquals(1, result.size)
         assertEquals("com.example", result[0].packageName)
-        assertEquals(8, result[0].getClassCount(SpringClassCounterType.ALL))
-        assertEquals(3, result[0].getClassCount(SpringClassCounterType.CONCRETE))
+        assertEquals(8, result[0].getClassReducedValueInt(SpringClassCounterType.ALL))
+        assertEquals(3, result[0].getClassReducedValueInt(SpringClassCounterType.CONCRETE))
     }
 
     @Test
@@ -94,7 +94,7 @@ class SpringPackageScannerTest {
         val cpJarUrl = SpringPackageScannerTest::class.java.getClassLoader().getResource("jar_for_test/sample.jar")
         val classLoader = URLClassLoader(arrayOf(cpJarUrl), null)
         val scanner = SpringPackageScanner(classLoader).apply {
-            applyClassCounter(SpringConcreteClassCounterFactory())
+            applyClassReducer(SpringConcreteClassCounterFactory())
         }
 
         val result = scanner.scan().asSequence().toList()
@@ -104,7 +104,7 @@ class SpringPackageScannerTest {
         assertEquals(1, result.size)
         val resultOne = result[0]
         val actualExc = assertThrows<IllegalArgumentException> {
-            resultOne.getClassCount(SpringClassCounterType.ALL)
+            resultOne.getClassReducedValueInt(SpringClassCounterType.ALL)
         }
         assertEquals(actualExc.message, SpringClassCounterType.ALL.toString())
     }

@@ -9,5 +9,5 @@ interface ScannedPackageElement<E, CT> {
      *
      * @throws IllegalArgumentException If the count cannot be done under the specified condition
      */
-    fun getClassCount(condition: CT): Int
+    fun getClassReducedValueInt(condition: CT): Int
 }
