@@ -1,7 +1,7 @@
 package jp.unaguna.classloader.sp
 
-import jp.unaguna.classloader.core.ClassCounter
-import jp.unaguna.classloader.core.ClassCounterFactory
+import jp.unaguna.classloader.core.ClassReducer
+import jp.unaguna.classloader.core.ClassReducerFactory
 import jp.unaguna.classloader.core.PackageScanner
 import jp.unaguna.classloader.core.ScannedPackageElement
 
@@ -14,8 +14,8 @@ class SpringPackageScanner(
     SpringClasspathScannerElement,
     SpringClassCounterType
     > {
-    private val classCounterFactories: MutableSet<
-        ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>
+    private val classReducerFactories: MutableSet<
+            ClassReducerFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>
         > = mutableSetOf()
     private val classpathScanner = SpringClasspathScanner(classLoader)
 
@@ -29,8 +29,8 @@ class SpringPackageScanner(
             }
 
             val scanned = packages[packageName]!!
-            for (counter in scanned.getClassCounters()) {
-                counter.countIfMatch(scannedClass)
+            for (reducer in scanned.getClassReducers()) {
+                reducer.apply(scannedClass)
             }
         }
 
@@ -39,16 +39,18 @@ class SpringPackageScanner(
 
     private fun createScannedInstance(packageName: String): SpringPackageScannerElement {
         return SpringPackageScannerElement(packageName).apply {
-            for (classCounterFactory in classCounterFactories) {
-                applyCounter(classCounterFactory.create())
+            for (classReducerFactory in classReducerFactories) {
+                applyReducer(classReducerFactory.create())
             }
         }
     }
 
-    override fun applyClassCounter(
-        counterFactory: ClassCounterFactory<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>,
+    override fun applyClassReducer(
+        reducerFactory: ClassReducerFactory<
+                ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *
+        >,
     ) {
-        this.classCounterFactories.add(counterFactory)
+        this.classReducerFactories.add(reducerFactory)
     }
 
     override fun pattern(packageNamePatterns: Iterable<String>) {
@@ -59,27 +61,31 @@ class SpringPackageScanner(
 class SpringPackageScannerElement(
     override val element: String,
 ) : ScannedPackageElement<String, SpringClassCounterType> {
-    private val classCounter: MutableMap<
+    private val classReducer: MutableMap<
         SpringClassCounterType,
-        ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>
+        ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>
         > = mutableMapOf()
 
     override val packageName: String
         get() = element
 
-    override fun getClassCount(condition: SpringClassCounterType): Int {
-        val counter = this.classCounter[condition]
+    override fun getClassReducedValueInt(condition: SpringClassCounterType): Int {
+        val counter = this.classReducer[condition]
             ?: throw IllegalArgumentException(condition.toString())
 
-        return counter.count
+        val value = counter.value as Int
+
+        return value
     }
 
-    fun applyCounter(counter: ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>) {
-        classCounter[counter.type] = counter
+    fun applyReducer(
+        reducer: ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>,
+    ) {
+        classReducer[reducer.type] = reducer
     }
 
-    internal fun getClassCounters():
-        List<ClassCounter<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType>> {
-        return classCounter.values.toList()
+    internal fun getClassReducers():
+        List<ClassReducer<ClassFileMetadata, SpringClasspathScannerElement, SpringClassCounterType, *>> {
+        return classReducer.values.toList()
     }
 }
