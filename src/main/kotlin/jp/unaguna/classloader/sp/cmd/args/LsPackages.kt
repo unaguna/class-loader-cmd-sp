@@ -8,6 +8,7 @@ import jp.unaguna.classloader.sp.cmd.createPackageLineFormatter
 import jp.unaguna.classloader.sp.cmd.createPackageValueProviderAdapter
 import jp.unaguna.classloader.sp.cmd.packageLineFormatterVariableReducerMap
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
+import jp.unaguna.fmtbuilder.TableDataFormatIterator
 import java.net.URLClassLoader
 
 @Parameters(
@@ -47,11 +48,15 @@ class LsPackages : SubCommand {
                 applyClassReducer(reducerType)
             }
         }
+        val bufferedIterator = TableDataFormatIterator(
+            lineFormatter,
+            scanner.scan(),
+            scannedAdapter,
+        )
 
         // 指定パッケージ配下をスキャン
-        for (scanned in scanner.scan()) {
-            scannedAdapter.setElement(scanned)
-            println(lineFormatter.format(scannedAdapter))
+        for (formattedLine in bufferedIterator) {
+            println(formattedLine)
         }
     }
 }
