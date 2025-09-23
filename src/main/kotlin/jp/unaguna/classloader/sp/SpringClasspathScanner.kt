@@ -85,17 +85,15 @@ private class SpringClasspathScannerIterator(
 ) : Iterator<SpringClasspathScannerElement> {
     val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
-        ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
+        ExtendClassTree().apply {
+            appendAll(scanned.map { loadMetadata(it) }.filter { includedByFilter(it) })
+        }.iterator()
     } else {
         scanned.iterator().asSequence()
-            .map { Pair(loadMetadata(it), 0) }
+            .map { loadMetadata(it) }
+            .filter { includedByFilter(it) }
+            .map { Pair(it, 0) }
             .iterator()
-    }
-
-    var nextElement: SpringClasspathScannerElement? = null
-
-    init {
-        calcNext()
     }
 
     private fun loadMetadata(resource: Resource): ClassFileMetadata {
@@ -105,33 +103,24 @@ private class SpringClasspathScannerIterator(
         return ClassFileMetadata(resource, metadataReader, classMetadata)
     }
 
-    /**
-     * Calc the next element and contain it into [nextElement]
-     */
-    private fun calcNext() {
-        while (innerIterator.hasNext()) {
-            val (nextFileMetadata, depth) = innerIterator.next()
-
-            if (includeFilters.all { it.match(nextFileMetadata.metadataReader, metadataReaderFactory) }) {
-                nextElement = SpringClasspathScannerElement(
-                    nextFileMetadata,
-                    depth = depth,
-                )
-                return
-            }
-        }
-
-        nextElement = null
+    private fun includedByFilter(metadata: ClassFileMetadata): Boolean {
+        return includeFilters.all { it.match(metadata.metadataReader, metadataReaderFactory) }
     }
 
     override fun next(): SpringClasspathScannerElement {
-        val next = nextElement ?: throw NoSuchElementException()
-        calcNext()
-        return next
+        if (!hasNext()) {
+            throw NoSuchElementException()
+        }
+
+        val (nextFileMetadata, depth) = innerIterator.next()
+        return SpringClasspathScannerElement(
+            nextFileMetadata,
+            depth = depth,
+        )
     }
 
     override fun hasNext(): Boolean {
-        return nextElement != null
+        return innerIterator.hasNext()
     }
 }
 
