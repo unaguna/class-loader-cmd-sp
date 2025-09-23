@@ -85,10 +85,14 @@ private class SpringClasspathScannerIterator(
 ) : Iterator<SpringClasspathScannerElement> {
     val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
-        ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
+        ExtendClassTree().apply {
+            appendAll(scanned.map { loadMetadata(it) }.filter { includedByFilter(it) })
+        }.iterator()
     } else {
         scanned.iterator().asSequence()
-            .map { Pair(loadMetadata(it), 0) }
+            .map { loadMetadata(it) }
+            .filter { includedByFilter(it) }
+            .map { Pair(it, 0) }
             .iterator()
     }
 
@@ -105,6 +109,10 @@ private class SpringClasspathScannerIterator(
         return ClassFileMetadata(resource, metadataReader, classMetadata)
     }
 
+    private fun includedByFilter(metadata: ClassFileMetadata): Boolean {
+        return includeFilters.all { it.match(metadata.metadataReader, metadataReaderFactory) }
+    }
+
     /**
      * Calc the next element and contain it into [nextElement]
      */
@@ -112,13 +120,11 @@ private class SpringClasspathScannerIterator(
         while (innerIterator.hasNext()) {
             val (nextFileMetadata, depth) = innerIterator.next()
 
-            if (includeFilters.all { it.match(nextFileMetadata.metadataReader, metadataReaderFactory) }) {
-                nextElement = SpringClasspathScannerElement(
-                    nextFileMetadata,
-                    depth = depth,
-                )
-                return
-            }
+            nextElement = SpringClasspathScannerElement(
+                nextFileMetadata,
+                depth = depth,
+            )
+            return
         }
 
         nextElement = null
