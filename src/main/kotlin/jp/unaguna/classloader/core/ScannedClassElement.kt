@@ -2,19 +2,23 @@ package jp.unaguna.classloader.core
 
 import java.net.URL
 
-interface ScannedElement<E> {
+interface ScannedClassElement<E> {
     val element: E
     val depth: Int
     val className: String
     val shortClassName: String
+    val packageName: String?
     val classSource: URL?
     val isAbstract: Boolean
     val isInterface: Boolean
     val isFinal: Boolean
     val isAnnotation: Boolean
+    val isConcrete: Boolean
+        get() = !isAbstract
     val visibility: Visibility
     val major: Int
     val minor: Int
+    val javaVersion: JavaVersion
     val serialVersionUID: Long?
 }
 

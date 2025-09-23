@@ -3,9 +3,16 @@ package jp.unaguna.classloader.sp.cmd
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.SpringClasspathScannerElement
 import jp.unaguna.fmtbuilder.DataFormat
+import jp.unaguna.fmtbuilder.ValuePadding
 import jp.unaguna.fmtbuilder.ValueProviderAdapter
+import jp.unaguna.fmtbuilder.VariablePaddingSpecifications
 
-fun createLineFormatter(
+private val padding = VariablePaddingSpecifications().apply {
+    add("%m", ValuePadding.LEFT)
+    add("%M", ValuePadding.LEFT)
+}
+
+fun createClassLineFormatter(
     longFormat: Boolean = false,
     longStatus: Boolean = false,
     showSource: Boolean = false,
@@ -28,7 +35,7 @@ fun createLineFormatter(
         }
 
         if (longFormat) {
-            append("%M %m")
+            append("%M.%m")
             append(fieldSep)
         }
 
@@ -39,17 +46,17 @@ fun createLineFormatter(
             append("%r")
         }
     }
-    return createLineFormatter(format)
+    return createClassLineFormatter(format)
 }
 
-fun createLineFormatter(
+fun createClassLineFormatter(
     format: String,
 ): DataFormat {
-    return DataFormat.fromPrintfFormat(format)
+    return DataFormat.fromPrintfFormat(format, padding)
 }
 
 @Suppress("CyclomaticComplexMethod")
-fun createValueProviderAdapter(): ValueProviderAdapter<SpringClasspathScannerElement> {
+fun createClassValueProviderAdapter(): ValueProviderAdapter<SpringClasspathScannerElement> {
     return ValueProviderAdapter.Builder<SpringClasspathScannerElement>().apply {
         addProvider("%c") { it.className }
         addProvider("%C") { it.shortClassName }

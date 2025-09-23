@@ -1,7 +1,8 @@
 package jp.unaguna.classloader.sp
 
 import jp.unaguna.classloader.core.ClasspathScannerResettable
-import jp.unaguna.classloader.core.ScannedElement
+import jp.unaguna.classloader.core.JavaVersion
+import jp.unaguna.classloader.core.ScannedClassElement
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.metaloader.ClassStaticLoader
 import jp.unaguna.classloader.sp.tree.ExtendClassTree
@@ -84,17 +85,15 @@ private class SpringClasspathScannerIterator(
 ) : Iterator<SpringClasspathScannerElement> {
     val metadataReaderFactory = CachingMetadataReaderFactory(resolver)
     val innerIterator = if (classExtensionTree) {
-        ExtendClassTree().apply { appendAll(scanned.map { loadMetadata(it) }) }.iterator()
+        ExtendClassTree().apply {
+            appendAll(scanned.map { loadMetadata(it) }.filter { includedByFilter(it) })
+        }.iterator()
     } else {
         scanned.iterator().asSequence()
-            .map { Pair(loadMetadata(it), 0) }
+            .map { loadMetadata(it) }
+            .filter { includedByFilter(it) }
+            .map { Pair(it, 0) }
             .iterator()
-    }
-
-    var nextElement: SpringClasspathScannerElement? = null
-
-    init {
-        calcNext()
     }
 
     private fun loadMetadata(resource: Resource): ClassFileMetadata {
@@ -104,40 +103,31 @@ private class SpringClasspathScannerIterator(
         return ClassFileMetadata(resource, metadataReader, classMetadata)
     }
 
-    /**
-     * Calc the next element and contain it into [nextElement]
-     */
-    private fun calcNext() {
-        while (innerIterator.hasNext()) {
-            val (nextFileMetadata, depth) = innerIterator.next()
-
-            if (includeFilters.all { it.match(nextFileMetadata.metadataReader, metadataReaderFactory) }) {
-                nextElement = SpringClasspathScannerElement(
-                    nextFileMetadata,
-                    depth = depth,
-                )
-                return
-            }
-        }
-
-        nextElement = null
+    private fun includedByFilter(metadata: ClassFileMetadata): Boolean {
+        return includeFilters.all { it.match(metadata.metadataReader, metadataReaderFactory) }
     }
 
     override fun next(): SpringClasspathScannerElement {
-        val next = nextElement ?: throw NoSuchElementException()
-        calcNext()
-        return next
+        if (!hasNext()) {
+            throw NoSuchElementException()
+        }
+
+        val (nextFileMetadata, depth) = innerIterator.next()
+        return SpringClasspathScannerElement(
+            nextFileMetadata,
+            depth = depth,
+        )
     }
 
     override fun hasNext(): Boolean {
-        return nextElement != null
+        return innerIterator.hasNext()
     }
 }
 
 class SpringClasspathScannerElement(
     override val element: ClassFileMetadata,
     override val depth: Int,
-) : ScannedElement<ClassFileMetadata> {
+) : ScannedClassElement<ClassFileMetadata> {
     override val className: String
         get() = element.classMetadata.className
 
@@ -147,6 +137,15 @@ class SpringClasspathScannerElement(
             className
         } else {
             className.substring(dot + 1)
+        }
+    }
+
+    override val packageName: String? by lazy {
+        val dot = className.lastIndexOf('.')
+        return@lazy if (dot < 0) {
+            null
+        } else {
+            className.substring(0, dot)
         }
     }
 
@@ -173,6 +172,9 @@ class SpringClasspathScannerElement(
 
     override val minor: Int
         get() = staticClassData.minor
+
+    override val javaVersion: JavaVersion
+        get() = JavaVersion(major, minor)
 
     override val serialVersionUID: Long?
         get() = staticClassData.serialVersionUID

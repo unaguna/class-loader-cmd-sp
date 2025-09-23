@@ -4,9 +4,10 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import jp.unaguna.classloader.cmd.validator.NonOption
 import jp.unaguna.classloader.sp.SpringClasspathScanner
-import jp.unaguna.classloader.sp.cmd.createLineFormatter
-import jp.unaguna.classloader.sp.cmd.createValueProviderAdapter
+import jp.unaguna.classloader.sp.cmd.createClassLineFormatter
+import jp.unaguna.classloader.sp.cmd.createClassValueProviderAdapter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
+import jp.unaguna.fmtbuilder.TableDataFormatIterator
 import java.lang.ClassCastException
 import java.net.URLClassLoader
 import kotlin.collections.iterator
@@ -90,18 +91,22 @@ class LsClasses : SubCommand {
         }
 
         val lineFormatter = format?.let { format ->
-            createLineFormatter(format)
-        } ?: createLineFormatter(
+            createClassLineFormatter(format)
+        } ?: createClassLineFormatter(
             longFormat = longFormat || longLongFormat,
             longStatus = longLongFormat,
             showSource = showSource,
         )
-        val scannedAdapter = createValueProviderAdapter()
+        val scannedAdapter = createClassValueProviderAdapter()
+        val bufferedIterator = TableDataFormatIterator(
+            lineFormatter,
+            scanner.scan(),
+            scannedAdapter,
+        )
 
         // 指定パッケージ配下をスキャン
-        for (scanned in scanner.scan()) {
-            scannedAdapter.setElement(scanned)
-            println(lineFormatter.format(scannedAdapter))
+        for (formattedLine in bufferedIterator) {
+            println(formattedLine)
         }
     }
 
