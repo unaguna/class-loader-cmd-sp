@@ -94,4 +94,8 @@ class ExtendTreeNode(private val el: ClassFileMetadata?) : ClassTreeNode<ClassFi
     fun addChild(node: ExtendTreeNode) {
         childNodes.add(node)
     }
+
+    override fun toString(): String {
+        return "${this.javaClass.simpleName}(${el?.classMetadata?.className ?: "dummy"})"
+    }
 }
