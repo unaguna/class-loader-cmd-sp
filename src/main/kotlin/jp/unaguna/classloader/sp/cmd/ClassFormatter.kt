@@ -3,7 +3,14 @@ package jp.unaguna.classloader.sp.cmd
 import jp.unaguna.classloader.core.Visibility
 import jp.unaguna.classloader.sp.SpringClasspathScannerElement
 import jp.unaguna.fmtbuilder.DataFormat
+import jp.unaguna.fmtbuilder.ValuePadding
 import jp.unaguna.fmtbuilder.ValueProviderAdapter
+import jp.unaguna.fmtbuilder.VariablePaddingSpecifications
+
+private val padding = VariablePaddingSpecifications().apply {
+    add("%m", ValuePadding.LEFT)
+    add("%M", ValuePadding.LEFT)
+}
 
 fun createClassLineFormatter(
     longFormat: Boolean = false,
@@ -45,7 +52,7 @@ fun createClassLineFormatter(
 fun createClassLineFormatter(
     format: String,
 ): DataFormat {
-    return DataFormat.fromPrintfFormat(format)
+    return DataFormat.fromPrintfFormat(format, padding)
 }
 
 @Suppress("CyclomaticComplexMethod")

@@ -7,6 +7,7 @@ import jp.unaguna.classloader.sp.SpringClasspathScanner
 import jp.unaguna.classloader.sp.cmd.createClassLineFormatter
 import jp.unaguna.classloader.sp.cmd.createClassValueProviderAdapter
 import jp.unaguna.classloader.utils.classpathSpecToURLArray
+import jp.unaguna.fmtbuilder.TableDataFormatIterator
 import java.lang.ClassCastException
 import java.net.URLClassLoader
 import kotlin.collections.iterator
@@ -97,11 +98,15 @@ class LsClasses : SubCommand {
             showSource = showSource,
         )
         val scannedAdapter = createClassValueProviderAdapter()
+        val bufferedIterator = TableDataFormatIterator(
+            lineFormatter,
+            scanner.scan(),
+            scannedAdapter,
+        )
 
         // 指定パッケージ配下をスキャン
-        for (scanned in scanner.scan()) {
-            scannedAdapter.setElement(scanned)
-            println(lineFormatter.format(scannedAdapter))
+        for (formattedLine in bufferedIterator) {
+            println(formattedLine)
         }
     }
 
