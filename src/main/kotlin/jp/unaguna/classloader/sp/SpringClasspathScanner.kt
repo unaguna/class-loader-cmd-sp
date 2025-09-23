@@ -96,12 +96,6 @@ private class SpringClasspathScannerIterator(
             .iterator()
     }
 
-    var nextElement: SpringClasspathScannerElement? = null
-
-    init {
-        calcNext()
-    }
-
     private fun loadMetadata(resource: Resource): ClassFileMetadata {
         val metadataReader = metadataReaderFactory.getMetadataReader(resource)
         val classMetadata = metadataReader.classMetadata
@@ -113,31 +107,20 @@ private class SpringClasspathScannerIterator(
         return includeFilters.all { it.match(metadata.metadataReader, metadataReaderFactory) }
     }
 
-    /**
-     * Calc the next element and contain it into [nextElement]
-     */
-    private fun calcNext() {
-        while (innerIterator.hasNext()) {
-            val (nextFileMetadata, depth) = innerIterator.next()
-
-            nextElement = SpringClasspathScannerElement(
-                nextFileMetadata,
-                depth = depth,
-            )
-            return
+    override fun next(): SpringClasspathScannerElement {
+        if (!hasNext()) {
+            throw NoSuchElementException()
         }
 
-        nextElement = null
-    }
-
-    override fun next(): SpringClasspathScannerElement {
-        val next = nextElement ?: throw NoSuchElementException()
-        calcNext()
-        return next
+        val (nextFileMetadata, depth) = innerIterator.next()
+        return SpringClasspathScannerElement(
+            nextFileMetadata,
+            depth = depth,
+        )
     }
 
     override fun hasNext(): Boolean {
-        return nextElement != null
+        return innerIterator.hasNext()
     }
 }
 
